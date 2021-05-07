@@ -7,6 +7,7 @@ import DatabaseService from './database-service';
 import EnvironmentService from './environment-service';
 import ErrorService from './error-service';
 import ExpressService from './express-service';
+import GuirlandeService from './guirlande-service';
 import LogService from './log-service';
 import SchedulerService from './scheduler-service';
 import ServerService from './server-service';
@@ -51,6 +52,7 @@ export default class ServiceContainer {
   private _cache: CacheService;
   private _scheduler: SchedulerService;
   private _websocket: WebsocketService;
+  private _guirlande: GuirlandeService;
 
   /**
    * Creates a new services container.
@@ -70,6 +72,7 @@ export default class ServiceContainer {
     this._cache = null;
     this._scheduler = null;
     this._websocket = null;
+    this._guirlande = null;
     this.env.load(); // Autoload environment
   }
 
@@ -183,5 +186,13 @@ export default class ServiceContainer {
       this.logger.info('Loaded websocket service');
     }
     return this._websocket;
+  }
+
+  public get guirlande(): GuirlandeService {
+    if (!this._guirlande) {
+      this._guirlande = new GuirlandeService(this);
+      this.logger.info('Loaded Guirlande service');
+    }
+    return this._guirlande;
   }
 }
