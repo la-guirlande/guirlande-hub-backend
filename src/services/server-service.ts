@@ -38,6 +38,12 @@ export default class ServerService extends Service {
     // Connecting to database
     await this.container.db.connect(DB_URL);
     this.logger.info(`Connected to database "${DB_URL}"`);
+
+    // Technical user creation if no user exists
+    await this.container.users.createTechnicalUserIfNoUserExists();
+
+    // Guirlande creation if not exist
+    await this.container.guirlande.createIfNotExists();
   }
 
   /**
