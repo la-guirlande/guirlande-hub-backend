@@ -12,6 +12,7 @@ import LogService from './log-service';
 import SchedulerService from './scheduler-service';
 import ServerService from './server-service';
 import TokenService from './token-service';
+import UserService from './user-service';
 import WebsocketService from './websocket-service';
 
 /**
@@ -52,6 +53,7 @@ export default class ServiceContainer {
   private _cache: CacheService;
   private _scheduler: SchedulerService;
   private _websocket: WebsocketService;
+  private _users: UserService;
   private _guirlande: GuirlandeService;
 
   /**
@@ -72,6 +74,7 @@ export default class ServiceContainer {
     this._cache = null;
     this._scheduler = null;
     this._websocket = null;
+    this._users = null;
     this._guirlande = null;
     this.env.load(); // Autoload environment
   }
@@ -186,6 +189,14 @@ export default class ServiceContainer {
       this.logger.info('Loaded websocket service');
     }
     return this._websocket;
+  }
+
+  public get users(): UserService {
+    if (!this._users) {
+      this._users = new UserService(this);
+      this.logger.info('Loaded users service');
+    }
+    return this._users;
   }
 
   public get guirlande(): GuirlandeService {
