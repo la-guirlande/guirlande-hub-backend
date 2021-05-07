@@ -8,3 +8,5 @@ cache:
   useClones: false
 express:
   requestSizeLimit: 50mb
+guirlande:
+  codeLength: 4

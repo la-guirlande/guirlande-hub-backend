@@ -105,5 +105,8 @@ export interface ServicesConfiguration {
   };
   express: {
     requestSizeLimit: string;
+  };
+  guirlande: {
+    codeLength: number;
   }
 }
