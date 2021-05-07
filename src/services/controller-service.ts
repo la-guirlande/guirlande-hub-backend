@@ -1,6 +1,7 @@
 import { Application } from 'express';
 import AuthenticationController from '../controllers/authentication-controller';
 import Controller from '../controllers/controller';
+import GuirlandeController from '../controllers/guirlande-controller';
 import ProjectController from '../controllers/project-controller';
 import UserController from '../controllers/user-controller';
 import Service from './service';
@@ -27,7 +28,8 @@ export default class ControllerService extends Service {
     this.controllers = [
       new AuthenticationController(container),
       new UserController(container),
-      new ProjectController(container)
+      new ProjectController(container),
+      new GuirlandeController(container)
     ];
   }
 

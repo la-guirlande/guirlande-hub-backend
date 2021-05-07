@@ -1,0 +1,116 @@
+import { Request, Response } from 'express';
+import { Access } from '../models/guirlande-model';
+import ServiceContainer from '../services/service-container';
+import Controller from './controller';
+
+/**
+ * Guirlande controller class.
+ * 
+ * Root path : `/guirlande`
+ */
+export default class GuirlandeController extends Controller {
+
+  /**
+   * Creates a new Guirlande controller.
+   * 
+   * @param container Services container
+   */
+  public constructor(container: ServiceContainer) {
+    super(container, '/guirlande');
+
+    this.registerEndpoint({ method: 'GET', uri: '/', handlers: [this.container.auth.authenticateHandler, this.container.guirlande.accessHandler, this.infoHandler] });
+    this.registerEndpoint({ method: 'POST', uri: '/access', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.toggleAccessHandler] });
+    this.registerEndpoint({ method: 'GET', uri: '/code', handlers: [this.getCodeHandler] });
+    this.registerEndpoint({ method: 'POST', uri: '/code', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.generateCodeHandler] });
+  }
+
+  /**
+   * Gets Guirlande informations.
+   * 
+   * Path : `GET /guirlande`
+   * 
+   * @param req Express request
+   * @param res Express response
+   * @async
+   */
+  public async infoHandler(req: Request, res: Response): Promise<Response> {
+    try {
+      return res.status(200).send({ guirlande: await this.db.guirlande.findOne() });
+    } catch (err) {
+      this.logger.error(err);
+      return res.status(500).send(this.container.errors.formatServerError());
+    }
+  }
+
+  /**
+   * Toggles Guirlande access.
+   * 
+   * Access can be PUBLIC or PRIVATE.
+   * 
+   * Path : `POST /guirlande/access`
+   * 
+   * @param req Express request
+   * @param res Express response
+   * @async
+   */
+  public async toggleAccessHandler(req: Request, res: Response): Promise<Response> {
+    try {
+      const guirlande = await this.db.guirlande.findOne();
+      switch (guirlande.access) {
+        default:
+        case Access.PRIVATE:
+          guirlande.access = Access.PUBLIC;
+          break;
+        case Access.PUBLIC:
+          guirlande.access = Access.PRIVATE;
+          break;
+      }
+      await guirlande.save();
+      res.setHeader('Location', `${req.protocol}://${req.get('host')}${this.rootUri}/guirlande`);
+      return res.status(200).send({ access: guirlande.access });
+    } catch (err) {
+      this.logger.error(err);
+      return res.status(500).send(this.container.errors.formatServerError());
+    }
+  }
+
+  /**
+   * Gets current access code.
+   * 
+   * Path : `GET /guirlande/code`
+   * 
+   * @param req Express request
+   * @param res Express response
+   * @async
+   */
+  public async getCodeHandler(req: Request, res: Response): Promise<Response> {
+    try {
+      return res.status(200).send({ code: (await this.db.guirlande.findOne().select('code')).code })
+    } catch (err) {
+      this.logger.error(err);
+      return res.status(500).send(this.container.errors.formatServerError());
+    }
+  }
+
+  /**
+   * Generates a new access code.
+   * 
+   * Path : `POST /guirlande/code`
+   * 
+   * @param req Express request
+   * @param res Express response
+   * @async
+   */
+  public async generateCodeHandler(req: Request, res: Response): Promise<Response> {
+    try {
+      const guirlande = await this.db.guirlande.findOne();
+      guirlande.code = this.container.crypto.generateRandomNumeric(this.container.config.services.guirlande.codeLength);
+      await guirlande.save();
+      res.setHeader('Location', `${req.protocol}://${req.get('host')}${this.rootUri}/guirlande`);
+      return res.status(200).send({ code: guirlande.code });
+    } catch (err) {
+      this.logger.error(err);
+      return res.status(500).send(this.container.errors.formatServerError());
+    }
+  }
+}
