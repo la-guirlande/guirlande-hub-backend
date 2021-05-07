@@ -7,8 +7,8 @@ import Attributes from './model';
  * Guirlande attributes interface.
  */
 export interface GuirlandeAttributes extends Attributes {
-  access: Access;
-  code: string;
+  access?: Access;
+  code?: string;
 }
 
 /**
@@ -41,7 +41,7 @@ function createGuirlandeSchema(container: ServiceContainer) {
     },
     code: {
       type: Schema.Types.String,
-      default: null,
+      default: container.crypto.generateRandomNumeric(container.config.services.guirlande.codeLength),
       validate: {
         validator: (value: string) => value.length === container.config.services.guirlande.codeLength,
         message: 'Invalid code length'
