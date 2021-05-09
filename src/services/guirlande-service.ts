@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { promise as GPIO } from 'rpi-gpio';
 import { Access } from '../models/guirlande-model';
 import Service from './service';
 import ServiceContainer from './service-container';
@@ -65,6 +66,16 @@ export default class GuirlandeService extends Service {
     } catch (err) {
       this.logger.error(err);
       return res.status(500).send(this.container.errors.formatServerError());
+    }
+  }
+
+  // TODO Test only, will be removed soon
+  public async test(): Promise<void> {
+    try {
+      await GPIO.setup(7, GPIO.DIR_OUT);
+      await GPIO.write(7, true);
+    } catch (err) {
+      console.error(err);
     }
   }
 }
