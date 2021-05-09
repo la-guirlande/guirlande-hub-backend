@@ -1,4 +1,5 @@
 import { Model, Mongoose } from 'mongoose';
+import createGuirlandeModel, { GuirlandeInstance } from '../models/guirlande-model';
 import createProjectModel, { ProjectInstance } from '../models/project-model';
 import createUserModel, { UserInstance } from '../models/user-model';
 import Service from './service';
@@ -13,6 +14,7 @@ export default class DatabaseService extends Service {
 
   public readonly users: Model<UserInstance>;
   public readonly projects: Model<ProjectInstance>;
+  public readonly guirlande: Model<GuirlandeInstance>
   private readonly mongoose: Mongoose;
 
   /**
@@ -25,6 +27,7 @@ export default class DatabaseService extends Service {
     this.mongoose = this.createMongoose();
     this.users = createUserModel(container, this.mongoose);
     this.projects = createProjectModel(container, this.mongoose);
+    this.guirlande = createGuirlandeModel(container, this.mongoose);
   }
 
   /**

@@ -105,5 +105,14 @@ export interface ServicesConfiguration {
   };
   express: {
     requestSizeLimit: string;
-  }
+  };
+  users: {
+    technical: {
+      email: string;
+      name: string;
+    };
+  };
+  guirlande: {
+    codeLength: number;
+  };
 }

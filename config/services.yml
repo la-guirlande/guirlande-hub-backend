@@ -8,3 +8,9 @@ cache:
   useClones: false
 express:
   requestSizeLimit: 50mb
+users:
+  technical:
+    email: "technical@guirlande.com"
+    name: "Technical user"
+guirlande:
+  codeLength: 4
