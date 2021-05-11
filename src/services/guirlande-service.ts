@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { promise as GPIO } from 'rpi-gpio';
+import { Gpio } from 'pigpio';
 import { Access } from '../models/guirlande-model';
 import Service from './service';
 import ServiceContainer from './service-container';
@@ -11,6 +11,10 @@ import ServiceContainer from './service-container';
  */
 export default class GuirlandeService extends Service {
 
+  private readonly red: Gpio;
+  private readonly green: Gpio;
+  private readonly blue: Gpio;
+
   /**
    * Creates a new Guirlande service.
    * 
@@ -18,6 +22,9 @@ export default class GuirlandeService extends Service {
    */
   public constructor(container: ServiceContainer) {
     super(container);
+    this.red = new Gpio(container.config.services.guirlande.pins.red, { mode: Gpio.OUTPUT });
+    this.green = new Gpio(container.config.services.guirlande.pins.green, { mode: Gpio.OUTPUT });
+    this.blue = new Gpio(container.config.services.guirlande.pins.blue, { mode: Gpio.OUTPUT });
   }
 
   /**
@@ -69,13 +76,26 @@ export default class GuirlandeService extends Service {
     }
   }
 
-  // TODO Test only, will be removed soon
-  public async test(): Promise<void> {
-    try {
-      await GPIO.setup(7, GPIO.DIR_OUT);
-      await GPIO.write(7, true);
-    } catch (err) {
-      console.error(err);
-    }
+  /**
+   * Sets the LED color in hex format.
+   * 
+   * @param hex Color
+   */
+  public setColorHex(hex: string): void {
+    const pureHex = hex.startsWith('#') ? hex.substring(1, hex.length) : hex;
+    this.setColorRGB(parseInt(pureHex.substring(0, 2), 16), parseInt(pureHex.substring(2, 4), 16), parseInt(pureHex.substring(4, 6), 16));
+  }
+
+  /**
+   * Sets the LED color in RGB format.
+   * 
+   * @param red Red
+   * @param green Green
+   * @param blue Blue
+   */
+  public setColorRGB(red: number, green: number, blue: number): void {
+    this.red.pwmWrite(red);
+    this.green.pwmWrite(green);
+    this.blue.pwmWrite(blue);
   }
 }

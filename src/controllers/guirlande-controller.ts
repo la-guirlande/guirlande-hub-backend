@@ -22,6 +22,7 @@ export default class GuirlandeController extends Controller {
     this.registerEndpoint({ method: 'POST', uri: '/access', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.toggleAccessHandler] });
     this.registerEndpoint({ method: 'GET', uri: '/code', handlers: [this.getCodeHandler] });
     this.registerEndpoint({ method: 'POST', uri: '/code', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.generateCodeHandler] });
+    this.registerEndpoint({ method: 'POST', uri: '/color', handlers: [this.container.auth.authenticateHandler, this.container.guirlande.accessHandler, this.sendColorHandler] });
   }
 
   /**
@@ -113,4 +114,38 @@ export default class GuirlandeController extends Controller {
       return res.status(500).send(this.container.errors.formatServerError());
     }
   }
+
+  /**
+   * Sends a color.
+   * 
+   * Path : `POST /guirlande/color`
+   * 
+   * @param req Express request
+   * @param res Express response
+   * @async
+   */
+  public async sendColorHandler(req: Request, res: Response): Promise<Response> {
+    try {
+      const { color } = req.body as { color: Color; };
+      if (color == null) {
+        return res.status(400).send(this.container.errors.formatErrors({ error: 'invalid_request', error_description: 'Invalid color' }));
+      }
+      if (typeof color === 'string') {
+        this.container.guirlande.setColorHex(color);
+      } else if (color.red != null && color.green != null && color.blue != null) {
+        this.container.guirlande.setColorRGB(color.red, color.green, color.blue);
+      } else {
+        return res.status(400).send(this.container.errors.formatErrors({ error: 'invalid_request', error_description: 'Invalid color' }));
+      }
+      return res.status(200).send({ color });
+    } catch (err) {
+      this.logger.error(err);
+      return res.status(500).send(this.container.errors.formatServerError());
+    }
+  }
 }
+
+/**
+ * Color type.
+ */
+export type Color = string | { red: number, green: number, blue: number; };

@@ -44,9 +44,6 @@ export default class ServerService extends Service {
 
     // Guirlande creation if not exist
     await this.container.guirlande.createIfNotExists();
-
-    // TODO Test only, will be removed soon
-    await this.container.guirlande.test();
   }
 
   /**
