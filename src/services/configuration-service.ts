@@ -114,5 +114,10 @@ export interface ServicesConfiguration {
   };
   guirlande: {
     codeLength: number;
+    pins: {
+      red: number;
+      green: number;
+      blue: number;
+    };
   };
 }

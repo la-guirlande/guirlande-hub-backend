@@ -14,3 +14,7 @@ users:
     name: "Technical user"
 guirlande:
   codeLength: 4
+  pins:
+    red: 18
+    green: 13
+    blue: 19
