@@ -126,7 +126,7 @@ export default class GuirlandeController extends Controller {
    */
   public async sendColorHandler(req: Request, res: Response): Promise<Response> {
     try {
-      const { color } = req.body as { color: Color; };
+      const { color } = req.body as { color: ColorBody; };
       if (color == null) {
         return res.status(400).send(this.container.errors.formatErrors({ error: 'invalid_request', error_description: 'Invalid color' }));
       }
@@ -148,4 +148,4 @@ export default class GuirlandeController extends Controller {
 /**
  * Color type.
  */
-export type Color = string | { red: number, green: number, blue: number; };
+type ColorBody = string | { red: number, green: number, blue: number; };
