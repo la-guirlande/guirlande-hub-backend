@@ -27,9 +27,12 @@ export default class SchedulerService extends Service {
    * @param name Task name (used to stop the task)
    * @param fc Function to run
    * @param time Time interval in milliseconds
+   * @returns Created task
    */
-  public runTask(name: string, fc: (task?: Task) => void, time: number): void {
-    this.tasks.set(name, setInterval(fc, time, new Task(this, name)));
+  public runTask(name: string, fc: (task?: Task) => void, time: number): Task {
+    const task = new Task(this, name);
+    this.tasks.set(name, setInterval(fc, time, task));
+    return task;
   }
 
   /**
