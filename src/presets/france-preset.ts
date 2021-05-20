@@ -23,7 +23,7 @@ export default class FrancePreset extends Preset {
 
   public init(): void {
     this.color = new Color(0, 0, 0);
-    this.transition = new Transition(this.color, new Color(255, 0, 0), this.speed, 1);
+    this.transition = new Transition(this.color, new Color(0, 0, 255), this.speed, 1);
     this.counter = 0;
   }
 
@@ -43,13 +43,13 @@ export default class FrancePreset extends Preset {
           target = new Color(0, 0, 0);
           break;
         case 0:
-          target = new Color(255, 0, 0);
+          target = new Color(0, 0, 255);
           break;
         case 2:
           target = new Color(255, 255, 255);
           break;
         case 4:
-          target = new Color(0, 0, 255);
+          target = new Color(255, 0, 0);
           break;
       }
       this.transition.reset(this.color, target, this.speed, 1);
