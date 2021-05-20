@@ -119,5 +119,9 @@ export interface ServicesConfiguration {
       green: number;
       blue: number;
     };
+    presets: {
+      duration: number;
+      wait: number;
+    };
   };
 }

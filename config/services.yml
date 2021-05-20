@@ -18,3 +18,6 @@ guirlande:
     red: 18
     green: 13
     blue: 19
+  presets:
+    duration: 60
+    wait: 3
