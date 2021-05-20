@@ -15,6 +15,7 @@ import GuirlandePreset from '../presets/guirlande-preset';
 import Transition, { TransitionState } from '../presets/transition';
 import CinemaPreset from '../presets/cinema-preset';
 import FrancePreset from '../presets/france-preset';
+import MulticolorPreset from '../presets/multicolor-preset';
 
 /**
  * Guirlande service class.
@@ -50,7 +51,8 @@ export default class GuirlandeService extends Service {
       new CombuPreset(container),
       new GuirlandePreset(container),
       new CinemaPreset(container),
-      new FrancePreset(container)
+      new FrancePreset(container),
+      new MulticolorPreset(container)
     ];
     this.presetsTask = null;
   }
