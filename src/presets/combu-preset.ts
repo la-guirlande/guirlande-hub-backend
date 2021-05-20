@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { Color } from '../services/guirlande-service';
+import Color from './color';
 import ServiceContainer from '../services/service-container';
 import Preset from './preset';
 
@@ -10,6 +10,9 @@ export default class CombuPreset extends Preset {
 
   public constructor(container: ServiceContainer) {
     super(container, 'Combustion', 300);
+  }
+
+  protected init(): void {
     this.color = new Color(_.random(128, 242, false), _.random(9, 50, false), _.random(9, 19, false));
     this.blink = true;
   }
