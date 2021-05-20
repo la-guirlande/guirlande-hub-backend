@@ -179,6 +179,15 @@ export default class Color {
   }
 
   /**
+   * Copies color.
+   * 
+   * @returns Copy of this
+   */
+  public copy(): Color {
+    return new Color(this.r, this.g, this.b);
+  }
+
+  /**
    * Checks if this color is same as target color.
    * 
    * @param target Target color
