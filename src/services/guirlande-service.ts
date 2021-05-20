@@ -22,12 +22,12 @@ import Transition, { TransitionState } from '../presets/transition';
 export default class GuirlandeService extends Service {
 
   public color: Color;
+  public currentPreset: Preset;
   private readonly led_red: Gpio;
   private readonly led_green: Gpio;
   private readonly led_blue: Gpio;
   private readonly presets: Preset[];
   private presetsTask: Task;
-  private currentPreset: Preset;
 
   /**
    * Creates a new Guirlande service.
@@ -40,6 +40,7 @@ export default class GuirlandeService extends Service {
     this.led_green = new Gpio(container.config.services.guirlande.pins.green, { mode: Gpio.OUTPUT });
     this.led_blue = new Gpio(container.config.services.guirlande.pins.blue, { mode: Gpio.OUTPUT });
     this.color = new Color();
+    this.currentPreset = null;
     this.presets = [
       new PurpleFadePreset(container),
       new UtopiaBlinkPreset(container),
@@ -48,7 +49,6 @@ export default class GuirlandeService extends Service {
       new GuirlandePreset(container)
     ];
     this.presetsTask = null;
-    this.currentPreset = null;
   }
 
   /**
@@ -176,9 +176,11 @@ export default class GuirlandeService extends Service {
    * Stops presets.
    */
   public stopPresets(): void {
-    if (this.presetsTask == null) {
+    if (this.presetsTask != null) {
       this.presetsTask.stop();
       this.presetsTask = null;
+      this.currentPreset.stop();
+      this.currentPreset = null;
       this.setColorRGB(0, 0, 0);
     }
   }
