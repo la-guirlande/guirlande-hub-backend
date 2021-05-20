@@ -10,6 +10,9 @@ build/
 # Logs
 logs/
 
+# Tests
+src/presets/test-preset.ts
+
 # Visual Studio Code
 .vscode/*
 !.vscode/launch.json
