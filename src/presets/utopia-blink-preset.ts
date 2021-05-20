@@ -20,7 +20,7 @@ export default class UtopiaBlinkPreset extends Preset {
     this.max = 255;
   }
 
-  protected init(): void {
+  public init(): void {
     this.value = 0;
     this.blink = -1;
   }

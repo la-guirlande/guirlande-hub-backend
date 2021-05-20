@@ -34,7 +34,7 @@ export default abstract class Preset extends Component {
    * 
    * This method is executed before the `start()` method. It is useful to reset custom attributes before preset startup.
    */
-  protected abstract init(): void;
+  public abstract init(): void;
 
   /**
    * Starts the preset.

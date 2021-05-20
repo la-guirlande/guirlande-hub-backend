@@ -12,7 +12,7 @@ export default class CombuPreset extends Preset {
     super(container, 'Combustion', 300);
   }
 
-  protected init(): void {
+  public init(): void {
     this.color = new Color(_.random(128, 242, false), _.random(9, 50, false), _.random(9, 19, false));
     this.blink = true;
   }

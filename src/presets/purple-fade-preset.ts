@@ -20,7 +20,7 @@ export default class PurpleFadePreset extends Preset {
     super(container, 'Purple fade', 20);
   }
 
-  protected init(): void {
+  public init(): void {
     this.colorTarget = new Color(_.random(0, 200, false), _.random(0, 50, false), _.random(0, 255, false));
     this.colorCurrent = new Color();
   }

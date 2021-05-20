@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { Gpio } from 'pigpio';
 import { Access } from '../models/guirlande-model';
 import Color from '../presets/color';
+import EpilepsyPreset from '../presets/epilepsy-preset';
 import Preset from '../presets/preset';
 import PurpleFadePreset from '../presets/purple-fade-preset';
 import UtopiaBlinkPreset from '../presets/utopia-blink-preset';
@@ -40,6 +41,7 @@ export default class GuirlandeService extends Service {
     this.presets = [
       new PurpleFadePreset(container),
       new UtopiaBlinkPreset(container),
+      new EpilepsyPreset(container),
       new CombuPreset(container)
     ];
     this.presetsTask = null;
@@ -150,8 +152,9 @@ export default class GuirlandeService extends Service {
       }
     }
     const changePreset = () => {
-      this.currentPreset = this.presets[_.random(1, this.presets.length - 1, false)];
+      this.currentPreset = this.presets[_.random(0, this.presets.length - 1, false)];
       this.logger.info('Preset :', this.currentPreset.name);
+      this.currentPreset.init();
       this.currentPreset.start();
       this.logger.info(' > Starting preset');
     }
