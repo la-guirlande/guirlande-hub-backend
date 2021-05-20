@@ -44,9 +44,6 @@ export default class ServerService extends Service {
 
     // Guirlande creation if not exist
     await this.container.guirlande.createIfNotExists();
-
-    // TODO Make a route to toggle Guirlande presets
-    this.container.guirlande.startPresets();
   }
 
   /**
@@ -65,8 +62,5 @@ export default class ServerService extends Service {
     // Disconnecting from database
     await this.container.db.disconnect();
     this.logger.info('Disconnected from database');
-
-    // TODO Make a route to toggle Guirlande presets
-    this.container.guirlande.stopPresets();
   }
 }

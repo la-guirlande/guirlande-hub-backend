@@ -23,6 +23,7 @@ export default class GuirlandeController extends Controller {
     this.registerEndpoint({ method: 'GET', uri: '/code', handlers: [this.getCodeHandler] });
     this.registerEndpoint({ method: 'POST', uri: '/code', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.generateCodeHandler] });
     this.registerEndpoint({ method: 'POST', uri: '/color', handlers: [this.container.auth.authenticateHandler, this.container.guirlande.accessHandler, this.sendColorHandler] });
+    this.registerEndpoint({ method: 'POST', uri: '/presets', handlers: [this.container.auth.authenticateHandler, this.container.guirlande.accessHandler, this.togglePresetsHandler] });
   }
 
   /**
@@ -138,6 +139,26 @@ export default class GuirlandeController extends Controller {
         return res.status(400).send(this.container.errors.formatErrors({ error: 'invalid_request', error_description: 'Invalid color' }));
       }
       return res.status(200).send({ color });
+    } catch (err) {
+      this.logger.error(err);
+      return res.status(500).send(this.container.errors.formatServerError());
+    }
+  }
+
+  /**
+   * Toggles presets.
+   * 
+   * Path : `POST /guirlande/presets`
+   * 
+   * @param req Express request
+   * @param res Express response
+   * @async
+   */
+  public async togglePresetsHandler(req: Request, res: Response): Promise<Response> {
+    try {
+      const { guirlande } = this.container;
+      guirlande.currentPreset == null ? guirlande.startPresets() : guirlande.stopPresets();
+      return res.status(200).send({ status: guirlande.currentPreset != null });
     } catch (err) {
       this.logger.error(err);
       return res.status(500).send(this.container.errors.formatServerError());
