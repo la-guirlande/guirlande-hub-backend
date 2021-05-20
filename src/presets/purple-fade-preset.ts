@@ -23,14 +23,14 @@ export default class PurpleFadePreset extends Preset {
   }
 
   public init(): void {
-    this.colorTarget = new Color(_.random(0, 200, false), 0, _.random(0, 255, false));
+    this.colorTarget = new Color(_.random(40, 180, false), 0, _.random(60, 240, false));
     this.colorCurrent = new Color();
     this.transition = new Transition(this.colorCurrent, this.colorTarget, 20, 1);
   }
 
   protected run(): void {
     if (this.transition.state === TransitionState.FINISHED) {
-      this.colorTarget = new Color(_.random(0, 200, false), 0, _.random(0, 255, false));
+      this.colorTarget = new Color(_.random(40, 180, false), 0, _.random(60, 240, false));
       this.transition = new Transition(this.colorCurrent, this.colorTarget, 20, 1);
     }
     this.transition.run();
