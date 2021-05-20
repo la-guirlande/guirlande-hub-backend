@@ -13,7 +13,7 @@ export default class EpilepsyPreset extends Preset {
    * @param container Services container
    */
   public constructor(container: ServiceContainer) {
-    super(container, 'Epilepsy', 75);
+    super(container, 'Epilepsy', 0.075);
   }
 
   public init(): void {

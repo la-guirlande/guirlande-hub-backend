@@ -8,21 +8,33 @@ import Color from './color';
 export default class Transition {
 
   public state: TransitionState;
-  private readonly value: [number, number, number];
-  private readonly color: Color;
-  private readonly target: Color;
+  private value: [number, number, number];
+  private color: Color;
+  private target: Color;
 
   /**
    * Creates a new transition.
    * 
    * @param color Color to update
    * @param target Target color
-   * @param speed Speed (in milliseconds)
+   * @param speed Speed (in seconds)
    * @param duration Duration (in seconds)
    */
   public constructor(color: Color, target: Color, speed: number, duration: number) {
+    this.reset(color, target, speed, duration);
+  }
+
+  /**
+   * Resets the transition.
+   * 
+   * @param color Color to update
+   * @param target Target color
+   * @param speed Speed (in seconds)
+   * @param duration Duration (in seconds)
+   */
+  public reset(color: Color, target: Color, speed: number, duration: number): void {
     this.state = TransitionState.INIT;
-    this.value = this.calculateValue(color, target, speed, duration);
+    this.value = this.calculateValue(color, target, speed * 1000, duration);
     this.color = color;
     this.target = target;
   }
@@ -84,7 +96,7 @@ export default class Transition {
    * 
    * @param color Color to update
    * @param target Target color
-   * @param speed Speed
+   * @param speed Speed (in milliseconds)
    * @param duration Duration
    * @returns Value of transition
    */

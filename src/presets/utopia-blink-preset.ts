@@ -16,7 +16,7 @@ export default class UtopiaBlinkPreset extends Preset {
    * @param container Services container
    */
   public constructor(container: ServiceContainer) {
-    super(container, 'Utopia blink', 30);
+    super(container, 'Utopia blink', 0.03);
     this.max = 255;
   }
 

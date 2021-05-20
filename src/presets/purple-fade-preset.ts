@@ -19,7 +19,7 @@ export default class PurpleFadePreset extends Preset {
    * @param container Services container
    */
   public constructor(container: ServiceContainer) {
-    super(container, 'Purple fade', 20);
+    super(container, 'Purple fade', 0.02);
   }
 
   public init(): void {

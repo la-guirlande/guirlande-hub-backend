@@ -9,7 +9,7 @@ export default class CombuPreset extends Preset {
   private blink: boolean;
 
   public constructor(container: ServiceContainer) {
-    super(container, 'Combustion', 300);
+    super(container, 'Combustion', 0.3);
   }
 
   public init(): void {

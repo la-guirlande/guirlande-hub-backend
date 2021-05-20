@@ -12,16 +12,16 @@ export default abstract class Preset extends Component {
 
   public readonly name: string;
   private task: Task;
-  private readonly speed: number;
+  protected readonly speed: number;
 
   /**
    * Creates a new preset.
    * 
    * @param container Services container
    * @param name Name
-   * @param speed Speed (in milliseconds)
+   * @param speed Speed (in seconds)
    */
-  public constructor(container: ServiceContainer, name: string, speed: number = 10) {
+  public constructor(container: ServiceContainer, name: string, speed: number = 0.1) {
     super(container);
     this.name = name;
     this.task = null;
@@ -41,7 +41,7 @@ export default abstract class Preset extends Component {
    */
   public start(): void {
     if (this.task == null) {
-      this.task = this.container.scheduler.runTask(`preset-${this.name.toLowerCase()}`, this.run.bind(this), this.speed);
+      this.task = this.container.scheduler.runTask(`preset-${this.name.toLowerCase()}`, this.run.bind(this), this.speed * 1000);
     }
   }
 
