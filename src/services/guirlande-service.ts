@@ -6,6 +6,7 @@ import Color from '../presets/color';
 import Preset from '../presets/preset';
 import PurpleFadePreset from '../presets/purple-fade-preset';
 import UtopiaBlinkPreset from '../presets/utopia-blink-preset';
+import CombuPreset from '../presets/combu-preset';
 import { Task } from './scheduler-service';
 import Service from './service';
 import ServiceContainer from './service-container';
@@ -38,7 +39,8 @@ export default class GuirlandeService extends Service {
     this.color = new Color();
     this.presets = [
       new PurpleFadePreset(container),
-      new UtopiaBlinkPreset(container)
+      new UtopiaBlinkPreset(container),
+      new CombuPreset(container)
     ];
     this.presetsTask = null;
     this.currentPreset = null;
