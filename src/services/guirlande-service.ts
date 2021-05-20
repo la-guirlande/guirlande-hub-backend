@@ -12,6 +12,7 @@ import { Task } from './scheduler-service';
 import Service from './service';
 import ServiceContainer from './service-container';
 import GuirlandePreset from '../presets/guirlande-preset';
+import Transition, { TransitionState } from '../presets/transition';
 
 /**
  * Guirlande service class.
@@ -138,14 +139,17 @@ export default class GuirlandeService extends Service {
   public startPresets(): void {
     const start = () => {
       if (this.currentPreset) {
+        const color = this.color.copy();
+        const transition = new Transition(color, new Color(), 0.01, 2);
         this.currentPreset.stop();
         this.logger.info(' > Ending preset');
         this.container.scheduler.runTask('guirlande-presets-ending', task => {
-          this.setColor(this.color.substract(1, 1, 1));
-          if (this.color.equals(0, 0, 0)) {
+          transition.run();
+          this.setColor(color);
+          if (transition.state === TransitionState.FINISHED) {
             this.container.scheduler.runTimer(() => {
               changePreset();
-            }, 1000);
+            }, this.container.config.services.guirlande.presets.wait * 1000);
             task.stop();
           }
         }, 10);
@@ -163,7 +167,7 @@ export default class GuirlandeService extends Service {
     if (this.presetsTask == null) {
       this.presetsTask = this.container.scheduler.runTask('guirlande-presets', () => {
         start();
-      }, 60000);
+      }, this.container.config.services.guirlande.presets.duration * 1000);
       start();
     }
   }

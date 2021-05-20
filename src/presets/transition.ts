@@ -88,6 +88,9 @@ export default class Transition {
           }
         }
         break;
+      case TransitionState.FINISHED:
+      default:
+        break;
     }
   }
 
@@ -102,9 +105,9 @@ export default class Transition {
    */
   private calculateValue(color: Color, target: Color, speed: number, duration: number): [number, number, number] {
     const distance = color.distance(target);
-    let r = Math.floor(distance.r / (speed * duration));
-    let g = Math.floor(distance.g / (speed * duration));
-    let b = Math.floor(distance.b / (speed * duration));
+    let r = Math.abs(Math.floor(distance.r / (speed * duration)));
+    let g = Math.abs(Math.floor(distance.g / (speed * duration)));
+    let b = Math.abs(Math.floor(distance.b / (speed * duration)));
     r = r === 0 ? 1 : r;
     g = g === 0 ? 1 : g;
     b = b === 0 ? 1 : b;
