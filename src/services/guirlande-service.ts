@@ -11,6 +11,7 @@ import CombuPreset from '../presets/combu-preset';
 import { Task } from './scheduler-service';
 import Service from './service';
 import ServiceContainer from './service-container';
+import GuirlandePreset from '../presets/guirlande-preset';
 
 /**
  * Guirlande service class.
@@ -42,7 +43,8 @@ export default class GuirlandeService extends Service {
       new PurpleFadePreset(container),
       new UtopiaBlinkPreset(container),
       new EpilepsyPreset(container),
-      new CombuPreset(container)
+      new CombuPreset(container),
+      new GuirlandePreset(container)
     ];
     this.presetsTask = null;
     this.currentPreset = null;
