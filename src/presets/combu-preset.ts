@@ -3,11 +3,19 @@ import Color from './color';
 import ServiceContainer from '../services/service-container';
 import Preset from './preset';
 
+/**
+ * Combu preset.
+ */
 export default class CombuPreset extends Preset {
 
   private color: Color;
   private blink: boolean;
 
+  /**
+   * Creates a new Combu preset.
+   * 
+   * @param container Services container
+   */
   public constructor(container: ServiceContainer) {
     super(container, 'Combustion', 0.3);
   }

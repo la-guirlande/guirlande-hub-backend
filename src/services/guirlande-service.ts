@@ -14,6 +14,7 @@ import ServiceContainer from './service-container';
 import GuirlandePreset from '../presets/guirlande-preset';
 import Transition, { TransitionState } from '../presets/transition';
 import CinemaPreset from '../presets/cinema-preset';
+import FrancePreset from '../presets/france-preset';
 
 /**
  * Guirlande service class.
@@ -48,7 +49,8 @@ export default class GuirlandeService extends Service {
       new EpilepsyPreset(container),
       new CombuPreset(container),
       new GuirlandePreset(container),
-      new CinemaPreset(container)
+      new CinemaPreset(container),
+      new FrancePreset(container)
     ];
     this.presetsTask = null;
   }
