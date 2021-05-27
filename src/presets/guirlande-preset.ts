@@ -25,8 +25,8 @@ export default class GuirlandePreset extends Preset {
 
   public init(): void {
     this.color = new Color(0, 0, 0);
-    this.fadeInColor = new Color(146, 66, 254);
-    this.fadeOutColor = new Color(46, 0, 154);
+    this.fadeInColor = new Color(227, 0, 255);
+    this.fadeOutColor = new Color(107, 0, 135);
     this.transition = new Transition(this.color, this.fadeInColor, this.speed, 1);
     this.counter = 0;
   }
