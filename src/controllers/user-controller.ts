@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Error as MongooseError } from 'mongoose';
 import ServiceContainer from '../services/service-container';
 import Controller, { Link } from './controller';
 
@@ -93,8 +94,8 @@ export default class UserController extends Controller {
       });
     } catch (err) {
       this.logger.error(err);
-      if (err.name === 'ValidationError') {
-        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err)));
+      if ((err as Error).name === 'ValidationError') {
+        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err as MongooseError.ValidationError)));
       }
       return res.status(500).send(this.container.errors.formatServerError());
     }
@@ -139,8 +140,8 @@ export default class UserController extends Controller {
       });
     } catch (err) {
       this.logger.error(err);
-      if (err.name === 'ValidationError') {
-        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err)));
+      if ((err as Error).name === 'ValidationError') {
+        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err as MongooseError.ValidationError)));
       }
       return res.status(500).send(this.container.errors.formatServerError());
     }

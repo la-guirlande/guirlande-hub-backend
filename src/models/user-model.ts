@@ -25,7 +25,7 @@ export interface UserInstance extends UserAttributes, Document {}
  * @param mongoose Mongoose instance
  */
 export default function createModel(container: ServiceContainer, mongoose: Mongoose): Model<UserInstance> {
-  return mongoose.model('User', createUserSchema(container), 'users');
+  return mongoose.model<UserInstance>('User', createUserSchema(container), 'users');
 }
 
 /**
@@ -74,7 +74,7 @@ function createUserSchema(container: ServiceContainer) {
         this.password = await container.crypto.hash(this.password, parseInt(process.env.HASH_SALT, 10));
         return next();
       } catch (err) {
-        return next(err);
+        return next(err as Error);
       }
     }
   });

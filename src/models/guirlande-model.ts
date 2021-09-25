@@ -35,7 +35,7 @@ export interface ColorAttributes {
  * @returns Guirlande model
  */
 export default function createModel(container: ServiceContainer, mongoose: Mongoose): Model<GuirlandeInstance> {
-  return mongoose.model('Guirlande', createGuirlandeSchema(container), 'guirlande');
+  return mongoose.model<GuirlandeInstance>('Guirlande', createGuirlandeSchema(container), 'guirlande');
 }
 
 /**

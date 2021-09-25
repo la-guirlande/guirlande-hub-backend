@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Error as MongooseError } from 'mongoose';
 import ServiceContainer from '../services/service-container';
 import Controller from './controller';
 
@@ -81,8 +82,8 @@ export default class ProjectController extends Controller {
       return res.status(201).send({ id: project.id });
     } catch (err) {
       this.logger.error(err);
-      if (err.name === 'ValidationError') {
-        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err)));
+      if ((err as Error).name === 'ValidationError') {
+        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err as MongooseError.ValidationError)));
       }
       return res.status(500).send(this.container.errors.formatServerError());
     }
@@ -111,8 +112,8 @@ export default class ProjectController extends Controller {
       return res.status(200).send({ id: project.id });
     } catch (err) {
       this.logger.error(err);
-      if (err.name === 'ValidationError') {
-        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err)));
+      if ((err as Error).name === 'ValidationError') {
+        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err as MongooseError.ValidationError)));
       }
       return res.status(500).send(this.container.errors.formatServerError());
     }
@@ -147,8 +148,8 @@ export default class ProjectController extends Controller {
       return res.status(200).send({ id: project.id });
     } catch (err) {
       this.logger.error(err);
-      if (err.name === 'ValidationError') {
-        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err)));
+      if ((err as Error).name === 'ValidationError') {
+        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err as MongooseError.ValidationError)));
       }
       return res.status(500).send(this.container.errors.formatServerError());
     }
@@ -172,8 +173,8 @@ export default class ProjectController extends Controller {
       return res.status(204).send();
     } catch (err) {
       this.logger.error(err);
-      if (err.name === 'ValidationError') {
-        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err)));
+      if ((err as Error).name === 'ValidationError') {
+        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err as MongooseError.ValidationError)));
       }
       return res.status(500).send(this.container.errors.formatServerError());
     }

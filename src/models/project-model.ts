@@ -25,7 +25,7 @@ export interface ProjectInstance extends ProjectAttributes, Document {}
  * @returns Project model
  */
 export default function createModel(container: ServiceContainer, mongoose: Mongoose): Model<ProjectInstance> {
-  return mongoose.model('Project', createProjectSchema(), 'projects');
+  return mongoose.model<ProjectInstance>('Project', createProjectSchema(), 'projects');
 }
 
 /**
