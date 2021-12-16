@@ -38,6 +38,9 @@ export default class ServerService extends Service {
     // Connecting to database
     await this.container.db.connect(DB_URL);
     this.logger.info(`Connected to database "${DB_URL}"`);
+
+    // Sets pending timeout to all pending modules
+    this.container.modules.setPendingTimeout();
   }
 
   /**
