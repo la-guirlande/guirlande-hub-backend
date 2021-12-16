@@ -1,5 +1,6 @@
 import AuthenticationService from './authentication-service';
 import CacheService from './cache-service';
+import ColorService from './color-service';
 import ConfigurationService from './configuration-service';
 import ControllerService from './controller-service';
 import CryptoService from './crypto-service';
@@ -8,6 +9,7 @@ import EnvironmentService from './environment-service';
 import ErrorService from './error-service';
 import ExpressService from './express-service';
 import LogService from './log-service';
+import ModuleService from './module-service';
 import SchedulerService from './scheduler-service';
 import ServerService from './server-service';
 import TokenService from './token-service';
@@ -51,6 +53,8 @@ export default class ServiceContainer {
   private _cache: CacheService;
   private _scheduler: SchedulerService;
   private _websocket: WebsocketService;
+  private _color: ColorService;
+  private _modules: ModuleService;
 
   /**
    * Creates a new services container.
@@ -70,6 +74,8 @@ export default class ServiceContainer {
     this._cache = null;
     this._scheduler = null;
     this._websocket = null;
+    this._color = null;
+    this._modules = null;
     this.env.load(); // Autoload environment
   }
 
@@ -183,5 +189,21 @@ export default class ServiceContainer {
       this.logger.info('Loaded websocket service');
     }
     return this._websocket;
+  }
+
+  public get color(): ColorService {
+    if (!this._color) {
+      this._color = new ColorService(this);
+      this.logger.info('Loaded color service');
+    }
+    return this._color;
+  }
+
+  public get modules(): ModuleService {
+    if (!this._modules) {
+      this._modules = new ModuleService(this);
+      this.logger.info('Loaded modules service');
+    }
+    return this._modules;
   }
 }
