@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import DisconnectWebSocket from '../websockets/disconnect-websocket';
+import ModuleWebSocket from '../websockets/module-websocket';
 import Websocket from '../websockets/websocket';
 import Service from './service';
 import ServiceContainer from './service-container';
@@ -23,7 +24,8 @@ export default class WebsocketService extends Service {
     super(container);
     this.srv = null;
     this.websockets = [
-      new DisconnectWebSocket(container)
+      new DisconnectWebSocket(container),
+      new ModuleWebSocket(container)
     ];
   }
 
