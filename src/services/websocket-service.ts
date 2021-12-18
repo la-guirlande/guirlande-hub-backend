@@ -65,7 +65,6 @@ export default class WebsocketService extends Service {
       this.logger.info(`Websocket connected : ${socket.handshake.address}`);
       this.websockets.forEach(websocket => {
         websocket.createEvents(this.srv, socket);
-        this.logger.info('Registered websocket', websocket.constructor.name);
       });
     });
   }
