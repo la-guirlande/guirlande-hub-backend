@@ -19,6 +19,8 @@ export default class ModuleController extends Controller {
     this.registerEndpoint({ method: 'GET', uri: '/', handlers: this.listHandler });
     this.registerEndpoint({ method: 'GET', uri: '/:moduleId', handlers: this.getHandler });
     this.registerEndpoint({ method: 'POST', uri: '/register', handlers: this.registerHandler });
+    this.registerEndpoint({ method: 'PUT', uri: '/:moduleId/validate', handlers: this.validateHandler });
+    this.registerEndpoint({ method: 'PUT', uri: '/:moduleId/invalidate', handlers: this.invalidateHandler });
   }
 
   /**
@@ -79,6 +81,64 @@ export default class ModuleController extends Controller {
       const module = await this.db.modules.create({ type });
       this.container.modules.setPendingTimeout(module.id);
       return res.status(200).json({ token: await this.container.modules.generateToken(module) });
+    } catch (err) {
+      this.logger.error(err);
+      if (err instanceof MongooseError.ValidationError) {
+        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err)));
+      }
+      return res.status(500).send(this.container.errors.formatServerError());
+    }
+  }
+
+  /**
+   * Validates a module.
+   * 
+   * Path : `PUT /modules/:moduleId/validate`
+   * 
+   * @param req Express request
+   * @param res Express response
+   * @async
+   */
+  public async validateHandler(req: Request, res: Response): Promise<Response> {
+    try {
+      const module = await this.db.modules.findById(req.params.moduleId);
+      if (module == null) {
+        return res.status(404).json(this.container.errors.formatErrors({
+          error: 'not_found',
+          error_description: 'Module not found'
+        }));
+      }
+      await this.container.modules.validate(module);
+      return res.status(200).json();
+    } catch (err) {
+      this.logger.error(err);
+      if (err instanceof MongooseError.ValidationError) {
+        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err)));
+      }
+      return res.status(500).send(this.container.errors.formatServerError());
+    }
+  }
+
+  /**
+   * Invalidates a module.
+   * 
+   * Path : `PUT /modules/:moduleId/invalidate`
+   * 
+   * @param req Express request
+   * @param res Express response
+   * @async
+   */
+  public async invalidateHandler(req: Request, res: Response): Promise<Response> {
+    try {
+      const module = await this.db.modules.findById(req.params.moduleId);
+      if (module == null) {
+        return res.status(404).json(this.container.errors.formatErrors({
+          error: 'not_found',
+          error_description: 'Module not found'
+        }));
+      }
+      await this.container.modules.invalidate(module);
+      return res.status(200).json();
     } catch (err) {
       this.logger.error(err);
       if (err instanceof MongooseError.ValidationError) {
