@@ -1,5 +1,7 @@
+import { Socket } from 'socket.io';
 import { ModuleDocument } from '../models/module-model';
-import Module, { ModuleStatus } from '../modules/module';
+import LedStripModule from '../modules/led-strip/led-strip-module';
+import Module, { ModuleStatus, ModuleType } from '../modules/module';
 import Service from './service';
 import ServiceContainer from './service-container';
 
@@ -10,6 +12,8 @@ import ServiceContainer from './service-container';
  */
 export default class ModuleService extends Service {
 
+  public readonly registeredModules: Module[];
+
   /**
    * Creates a new modules service.
    * 
@@ -17,6 +21,26 @@ export default class ModuleService extends Service {
    */
   public constructor(container: ServiceContainer) {
     super(container);
+    this.registeredModules = [];
+  }
+
+  /**
+   * Creates a new module.
+   * 
+   * @param id Module ID (from module document stored in database)
+   * @param type Module type
+   * @param socket Linked websocket
+   * @returns Created module
+   */
+  public async create(id: string, type: ModuleType, socket: Socket): Promise<Module> {
+    const container = ServiceContainer.getInstance();
+    if (!await container.db.modules.exists({ _id: id })) {
+      throw new Error(`Module not found with ID ${id}`);
+    }
+    switch (type) {
+      case ModuleType.LED_STRIP: return new LedStripModule(container, id, socket);
+      default: throw new Error(`Unknown module type ${type}`);
+    }
   }
 
   /**

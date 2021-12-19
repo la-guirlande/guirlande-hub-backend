@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { Server, Socket } from 'socket.io';
 import { ModuleStatus } from '../modules/module';
 import ServiceContainer from '../services/service-container';
@@ -28,22 +29,29 @@ export default class ModuleWebSocket extends Websocket {
         await module.save();
         delete socket.data.moduleId; // TODO Check if successfuly deleted
         delete socket.data.moduleType; // TODO Check if successfuly deleted
+        _.remove(this.container.modules.registeredModules, module => module.id === socket.data.moduleId);
       }
     });
 
     socket.on(Event.REGISTER, async ({ token }: RegisterClientToServerEvent) => {
-      const module = await this.db.modules.findOne({ token });
-      if (module != null) {
-        if (module.status !== ModuleStatus.PENDING) {
-          module.status = ModuleStatus.ONLINE;
-          await module.save();
-          socket.data.moduleId = module.id;
-          socket.data.moduleType = module.type;
-          return socket.emit(Event.REGISTER, {  } as RegisterServerToClientEvent);
+      try {
+        const module = await this.db.modules.findOne({ token });
+        if (module != null) {
+          if (module.status !== ModuleStatus.PENDING) {
+            module.status = ModuleStatus.ONLINE;
+            await module.save();
+            socket.data.moduleId = module.id;
+            socket.data.moduleType = module.type;
+            this.container.modules.registeredModules.push(await this.container.modules.create(module.id, module.type, socket));
+            return socket.emit(Event.REGISTER, { status: module.status } as RegisterServerToClientEvent);
+          }
+          return socket.emit(Event.ERROR, { error: 'MODULE_IS_PENDING' } as ErrorServerToClientEvent);
         }
-        return;
+        return socket.emit(Event.ERROR, { error: 'MODULE_NOT_FOUND' } as ErrorServerToClientEvent);
+      } catch (err) {
+        this.logger.error(err);
+        return socket.emit(Event.ERROR, { error: 'MODULE_ERROR' } as ErrorServerToClientEvent);
       }
-      return socket.emit(Event.ERROR, { error: 'MODULE_NOT_FOUND' } as ErrorServerToClientEvent);
     });
   }
 
@@ -71,7 +79,7 @@ export interface RegisterClientToServerEvent {
  * Register event (server to client).
  */
 export interface RegisterServerToClientEvent {
-  
+  status: ModuleStatus;
 }
 
 /**
@@ -79,6 +87,8 @@ export interface RegisterServerToClientEvent {
  */
 export interface ErrorServerToClientEvent {
   error:
-    'MODULE_NOT_FOUND'
-  | 'MODULE_IS_PENDING';
+    'MODULE_ERROR'
+  | 'MODULE_NOT_FOUND'
+  | 'MODULE_IS_PENDING'
+  | 'MODULE_NOT_REGISTERED';
 }
