@@ -74,10 +74,15 @@ export default abstract class Module extends Component {
    * @param eventName Name of the event
    * @param data Data to send
    */
-  protected send<T extends ModuleDataOut>(eventName: string, data: T): void {
+  protected send<T extends ModuleDataOut>(eventName: string, data?: T): void {
     eventName = `module.${this.type}.${eventName}`;
-    this.socket.emit(eventName, data);
-    this.logger.debug('Sent on websocket event', eventName, 'with data :', data);
+    if (data == null) {
+      this.socket.emit(eventName);
+      this.logger.debug('Sent on websocket event', eventName);
+    } else {
+      this.socket.emit(eventName, data);
+      this.logger.debug('Sent on websocket event', eventName, 'with data :', data);
+    }
   }
 
   /**
