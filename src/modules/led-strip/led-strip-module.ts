@@ -35,10 +35,12 @@ export default class LedStripModule extends Module {
   /**
    * Sends a loop.
    * 
+   * If the `loop` parameter is not set, the module will stops it loop if running.
+   * 
    * @param loop Loop to send
    */
-  public sendLoop(loop: Loop): void {
-    this.send<LedStripModuleLoopDataOut>('loop', { loopData: loop.build() });
+  public sendLoop(loop?: Loop): void {
+    this.send<LedStripModuleLoopDataOut>('loop', { loop: loop?.build() });
   }
 }
 
@@ -55,5 +57,5 @@ export interface LedStripModuleColorDataOut extends ModuleDataOut {
  * LED strip module data outgoing for `loop` event.
  */
 export interface LedStripModuleLoopDataOut extends ModuleDataOut {
-  loopData: string;
+  loop?: string;
 }
