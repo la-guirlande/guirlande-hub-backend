@@ -41,6 +41,9 @@ export default class ServerService extends Service {
 
     // Sets pending timeout to all pending modules
     this.container.modules.setPendingTimeout();
+
+    // Sets all registered modules offline
+    this.container.modules.disconnectAll();
   }
 
   /**

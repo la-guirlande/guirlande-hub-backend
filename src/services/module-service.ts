@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { Socket } from 'socket.io';
 import { ModuleDocument } from '../models/module-model';
 import LedStripModule from '../modules/led-strip/led-strip-module';
@@ -12,7 +13,7 @@ import ServiceContainer from './service-container';
  */
 export default class ModuleService extends Service {
 
-  public readonly registeredModules: Module[];
+  public registeredModules: Module[];
 
   /**
    * Creates a new modules service.
@@ -56,6 +57,36 @@ export default class ModuleService extends Service {
     module.token = token;
     await module.save();
     return token;
+  }
+
+  /**
+   * Registers a module.
+   * 
+   * @param module Module to register
+   */
+  public register(module: Module): void {
+    this.registeredModules.push(module);
+  }
+
+  /**
+   * Disconnects a module.
+   * 
+   * @param module Module to disconnect
+   */
+  public disconnect(module: Module): void {
+    module.unload();
+    _.remove(this.registeredModules, registeredModule => registeredModule.id === module.id);
+  }
+
+  /**
+   * Disconnects all online modules.
+   */
+  public async disconnectAll(): Promise<void> {
+    this.registeredModules.forEach(module => {
+      module.unload();
+    });
+    this.registeredModules = [];
+    await this.db.modules.updateMany({ status: ModuleStatus.ONLINE }, { status: ModuleStatus.OFFLINE });
   }
 
   /**

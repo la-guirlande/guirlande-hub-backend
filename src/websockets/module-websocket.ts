@@ -27,7 +27,7 @@ export default class ModuleWebSocket extends Websocket {
         const module = await this.db.modules.findById(socket.data.moduleId);
         module.status = ModuleStatus.OFFLINE;
         await module.save();
-        _.remove(this.container.modules.registeredModules, module => module.id === socket.data.moduleId);
+        this.container.modules.disconnect(this.container.modules.registeredModules.find(registeredModule => registeredModule.id === module.id));
         delete socket.data.moduleId;
         delete socket.data.moduleType;
         this.logger.info('Module', module.name || module.id, 'disconnected');
@@ -43,7 +43,7 @@ export default class ModuleWebSocket extends Websocket {
             await module.save();
             socket.data.moduleId = module.id;
             socket.data.moduleType = module.type;
-            this.container.modules.registeredModules.push(await this.container.modules.create(module.id, module.type, socket));
+            this.container.modules.register(await this.container.modules.create(module.id, module.type, socket))
             this.logger.info('Module', module.name || module.id, 'registered');
             return socket.emit(Event.REGISTER, { status: module.status } as RegisterServerToClientEvent);
           }
