@@ -27,9 +27,10 @@ export default class ModuleWebSocket extends Websocket {
         const module = await this.db.modules.findById(socket.data.moduleId);
         module.status = ModuleStatus.OFFLINE;
         await module.save();
-        delete socket.data.moduleId; // TODO Check if successfuly deleted
-        delete socket.data.moduleType; // TODO Check if successfuly deleted
         _.remove(this.container.modules.registeredModules, module => module.id === socket.data.moduleId);
+        delete socket.data.moduleId;
+        delete socket.data.moduleType;
+        this.logger.info('Module', module.name || module.id, 'disconnected');
       }
     });
 
@@ -43,6 +44,7 @@ export default class ModuleWebSocket extends Websocket {
             socket.data.moduleId = module.id;
             socket.data.moduleType = module.type;
             this.container.modules.registeredModules.push(await this.container.modules.create(module.id, module.type, socket));
+            this.logger.info('Module', module.name || module.id, 'registered');
             return socket.emit(Event.REGISTER, { status: module.status } as RegisterServerToClientEvent);
           }
           return socket.emit(Event.ERROR, { error: 'MODULE_IS_PENDING' } as ErrorServerToClientEvent);
