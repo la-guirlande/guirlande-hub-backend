@@ -44,7 +44,7 @@ export default class ModuleWebSocket extends Websocket {
             socket.data.moduleId = module.id;
             socket.data.moduleType = module.type;
             this.container.modules.register(await this.container.modules.create(module.id, module.type, socket))
-            this.logger.info('Module', module.name || module.id, 'registered');
+            this.logger.info('Module', (module.name && `${module.name} (${module.id})`) || module.id, 'registered');
             return socket.emit(Event.REGISTER, { status: module.status } as RegisterServerToClientEvent);
           }
           return socket.emit(Event.ERROR, { error: 'MODULE_IS_PENDING' } as ErrorServerToClientEvent);
