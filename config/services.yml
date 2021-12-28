@@ -9,4 +9,4 @@ cache:
 express:
   requestSizeLimit: 50mb
 modules:
-  deletePendingTimeout: 3600
+  deleteInvalidatedTimeout: 10

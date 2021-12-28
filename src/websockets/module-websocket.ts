@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { Server, Socket } from 'socket.io';
 import { ModuleStatus } from '../modules/module';
 import ServiceContainer from '../services/service-container';
@@ -22,37 +21,31 @@ export default class ModuleWebSocket extends Websocket {
   }
 
   public createEvents(srv: Server, socket: Socket): void {
-    socket.on('disconnect', async () => {
-      if (this.isRegistered(socket)) {
-        const module = await this.db.modules.findById(socket.data.moduleId);
-        module.status = ModuleStatus.OFFLINE;
-        await module.save();
-        this.container.modules.disconnect(this.container.modules.registeredModules.find(registeredModule => registeredModule.id === module.id));
-        delete socket.data.moduleId;
-        delete socket.data.moduleType;
-        this.logger.info('Module', module.name || module.id, 'disconnected');
-      }
-    });
-
-    socket.on(Event.REGISTER, async ({ token }: RegisterClientToServerEvent) => {
+    socket.on(Event.CONNECT, async ({ token }: ConnectClientToServerEvent) => {
       try {
-        const module = await this.db.modules.findOne({ token });
+        const module = this.container.modules.modules.find(module => module.token === token);
         if (module != null) {
-          if (module.status !== ModuleStatus.PENDING) {
-            module.status = ModuleStatus.ONLINE;
-            await module.save();
+          if (module.validated) {
+            module.connect(socket);
             socket.data.moduleId = module.id;
-            socket.data.moduleType = module.type;
-            this.container.modules.register(await this.container.modules.create(module.id, module.type, socket))
             this.logger.info('Module', (module.name && `${module.name} (${module.id})`) || module.id, 'registered');
-            return socket.emit(Event.REGISTER, { status: module.status } as RegisterServerToClientEvent);
+            return socket.emit(Event.CONNECT, { status: module.status } as ConnectServerToClientEvent);
           }
-          return socket.emit(Event.ERROR, { error: 'MODULE_IS_PENDING' } as ErrorServerToClientEvent);
+          return socket.emit(Event.ERROR, { error: 'MODULE_NOT_VALIDATED' } as ErrorServerToClientEvent);
         }
         return socket.emit(Event.ERROR, { error: 'MODULE_NOT_FOUND' } as ErrorServerToClientEvent);
       } catch (err) {
         this.logger.error(err);
         return socket.emit(Event.ERROR, { error: 'MODULE_ERROR' } as ErrorServerToClientEvent);
+      }
+    });
+
+    socket.on('disconnect', async () => {
+      if (this.isRegistered(socket)) {
+        const module = this.container.modules.modules.find(module => module.id === socket.data.moduleId);
+        module.disconnect();
+        delete socket.data.moduleId;
+        this.logger.info('Module', (module.name && `${module.name} (${module.id})`) || module.id, 'disconnected');
       }
     });
   }
@@ -66,21 +59,22 @@ export default class ModuleWebSocket extends Websocket {
  * Module events.
  */
 export enum Event {
-  REGISTER = 'module.register',
+  CONNECT = 'module.connect',
+  DISCONNECT = 'module.disconnect',
   ERROR = 'module.error'
 }
 
 /**
  * Register event (client to server).
  */
-export interface RegisterClientToServerEvent {
+export interface ConnectClientToServerEvent {
   token: string;
 }
 
 /**
  * Register event (server to client).
  */
-export interface RegisterServerToClientEvent {
+export interface ConnectServerToClientEvent {
   status: ModuleStatus;
 }
 
@@ -91,6 +85,5 @@ export interface ErrorServerToClientEvent {
   error:
     'MODULE_ERROR'
   | 'MODULE_NOT_FOUND'
-  | 'MODULE_IS_PENDING'
-  | 'MODULE_NOT_REGISTERED';
+  | 'MODULE_NOT_VALIDATED';
 }

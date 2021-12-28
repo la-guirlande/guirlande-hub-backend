@@ -1,6 +1,6 @@
-import { Socket } from 'socket.io';
+import { ModuleDocument } from '../../models/module-model';
 import ServiceContainer from '../../services/service-container';
-import Module, { ModuleDataOut, ModuleType } from '../module';
+import Module, { ModuleDataOut } from '../module';
 import { Loop } from './loop';
 
 /**
@@ -14,11 +14,10 @@ export default class LedStripModule extends Module {
    * Creates a new LED strip module.
    * 
    * @param container Services container
-   * @param id Module ID (must be same as module document stored in database)
-   * @param socket Linked websocket
+   * @param doc Module document
    */
-  public constructor(container: ServiceContainer, id: string, socket: Socket) {
-    super(container, id, ModuleType.LED_STRIP, socket);
+  public constructor(container: ServiceContainer, doc: ModuleDocument) {
+    super(container, doc);
   }
 
   /**
@@ -42,6 +41,9 @@ export default class LedStripModule extends Module {
   public sendLoop(loop?: Loop): void {
     this.send<LedStripModuleLoopDataOut>('loop', { loop: loop?.build() });
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  protected registerListeners(): void {}
 }
 
 /**

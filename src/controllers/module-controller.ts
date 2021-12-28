@@ -34,7 +34,7 @@ export default class ModuleController extends Controller {
    */
   public async listHandler(req: Request, res: Response): Promise<Response> {
     try {
-      return res.status(200).json({ modules: await this.db.modules.find() });
+      return res.status(200).json({ modules: this.container.modules.modules.map(module => module.toJSON()) });
     } catch (err) {
       this.logger.error(err);
       return res.status(500).send(this.container.errors.formatServerError());
@@ -52,7 +52,7 @@ export default class ModuleController extends Controller {
    */
   public async getHandler(req: Request, res: Response): Promise<Response> {
     try {
-      const module = await this.db.modules.findById(req.params.moduleId);
+      const module = this.container.modules.modules.find(module => module.id === req.params.moduleId);
       if (module == null) {
         return res.status(404).json(this.container.errors.formatErrors({
           error: 'not_found',
@@ -78,9 +78,8 @@ export default class ModuleController extends Controller {
   public async registerHandler(req: Request, res: Response): Promise<Response> {
     const { type } = req.body;
     try {
-      const module = await this.db.modules.create({ type });
-      this.container.modules.setPendingTimeout(module.id);
-      return res.status(200).json({ token: await this.container.modules.generateToken(module) });
+      const module = await this.container.modules.create(type);
+      return res.status(200).json({ token: await module.generateToken() });
     } catch (err) {
       this.logger.error(err);
       if (err instanceof MongooseError.ValidationError) {
@@ -101,14 +100,14 @@ export default class ModuleController extends Controller {
    */
   public async validateHandler(req: Request, res: Response): Promise<Response> {
     try {
-      const module = await this.db.modules.findById(req.params.moduleId);
+      const module = this.container.modules.modules.find(module => module.id === req.params.moduleId);
       if (module == null) {
         return res.status(404).json(this.container.errors.formatErrors({
           error: 'not_found',
           error_description: 'Module not found'
         }));
       }
-      await this.container.modules.validate(module);
+      await module.validate();
       return res.status(200).json();
     } catch (err) {
       this.logger.error(err);
@@ -130,14 +129,43 @@ export default class ModuleController extends Controller {
    */
   public async invalidateHandler(req: Request, res: Response): Promise<Response> {
     try {
-      const module = await this.db.modules.findById(req.params.moduleId);
+      const module = this.container.modules.modules.find(module => module.id === req.params.moduleId);
       if (module == null) {
         return res.status(404).json(this.container.errors.formatErrors({
           error: 'not_found',
           error_description: 'Module not found'
         }));
       }
-      await this.container.modules.invalidate(module);
+      await module.invalidate();
+      return res.status(200).json();
+    } catch (err) {
+      this.logger.error(err);
+      if (err instanceof MongooseError.ValidationError) {
+        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err)));
+      }
+      return res.status(500).send(this.container.errors.formatServerError());
+    }
+  }
+
+  /**
+   * Disconnects a module.
+   * 
+   * Path : `POST /modules/:moduleId/disconnect`
+   * 
+   * @param req Express request
+   * @param res Express response
+   * @async
+   */
+  public async disconnectHandler(req: Request, res: Response): Promise<Response> {
+    try {
+      const module = this.container.modules.modules.find(module => module.id === req.params.moduleId);
+      if (module == null) {
+        return res.status(404).json(this.container.errors.formatErrors({
+          error: 'not_found',
+          error_description: 'Module not found'
+        }));
+      }
+      module.disconnect();
       return res.status(200).json();
     } catch (err) {
       this.logger.error(err);

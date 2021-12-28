@@ -107,6 +107,6 @@ export interface ServicesConfiguration {
     requestSizeLimit: string;
   };
   modules: {
-    deletePendingTimeout: number;
+    deleteInvalidatedTimeout: number;
   };
 }

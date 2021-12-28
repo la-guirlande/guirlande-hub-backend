@@ -1,6 +1,6 @@
 import mongooseToJson from '@meanie/mongoose-to-json';
 import { Document, Model, Mongoose, Schema } from 'mongoose';
-import { ModuleStatus, ModuleType } from '../modules/module';
+import { ModuleType } from '../modules/module';
 import ServiceContainer from '../services/service-container';
 import Timestamps from './model';
 
@@ -10,7 +10,7 @@ import Timestamps from './model';
 export interface Module extends Timestamps {
   type: ModuleType;
   name?: string;
-  status?: ModuleStatus;
+  validated?: boolean;
   token?: string;
 }
 
@@ -52,10 +52,9 @@ function createModuleSchema() {
       type: Schema.Types.String,
       default: null
     },
-    status: {
-      type: Schema.Types.Number,
-      default: ModuleStatus.PENDING,
-      enum: Object.values(ModuleStatus).filter((value) => typeof value === 'number')
+    validated: {
+      type: Schema.Types.Boolean,
+      default: false
     },
     token: {
       type: Schema.Types.String,

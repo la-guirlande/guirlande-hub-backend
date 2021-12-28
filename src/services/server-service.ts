@@ -39,11 +39,8 @@ export default class ServerService extends Service {
     await this.container.db.connect(DB_URL);
     this.logger.info(`Connected to database "${DB_URL}"`);
 
-    // Sets pending timeout to all pending modules
-    this.container.modules.setPendingTimeout();
-
-    // Sets all registered modules offline
-    this.container.modules.disconnectAll();
+    // Loads all modules
+    await this.container.modules.load();
   }
 
   /**
@@ -62,5 +59,8 @@ export default class ServerService extends Service {
     // Disconnecting from database
     await this.container.db.disconnect();
     this.logger.info('Disconnected from database');
+
+    // Unloads all modules
+    await this.container.modules.unload();
   }
 }

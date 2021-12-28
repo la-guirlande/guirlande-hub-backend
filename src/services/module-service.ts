@@ -1,8 +1,7 @@
 import _ from 'lodash';
-import { Socket } from 'socket.io';
 import { ModuleDocument } from '../models/module-model';
 import LedStripModule from '../modules/led-strip/led-strip-module';
-import Module, { ModuleStatus, ModuleType } from '../modules/module';
+import Module, { ModuleType } from '../modules/module';
 import Service from './service';
 import ServiceContainer from './service-container';
 
@@ -13,7 +12,7 @@ import ServiceContainer from './service-container';
  */
 export default class ModuleService extends Service {
 
-  public registeredModules: Module[];
+  public readonly modules: Module[];
 
   /**
    * Creates a new modules service.
@@ -22,123 +21,75 @@ export default class ModuleService extends Service {
    */
   public constructor(container: ServiceContainer) {
     super(container);
-    this.registeredModules = [];
+    this.modules = [];
+  }
+
+  /**
+   * Loads all modules.
+   */
+  public async load(): Promise<void> {
+    const docs = await this.db.modules.find().populate('token');
+    const modules = docs.map(doc => this.loadInternal(doc))
+    this.modules.push(...modules);
+    this.modules.filter(module => !module.validated).forEach(module => this.deleteInvalidatedTimeout(module));
+  }
+
+  /**
+   * Unloads all modules.
+   */
+  public async unload(): Promise<void> {
+    this.modules.forEach(module => module.disconnect());
+    this.modules.length = 0;
   }
 
   /**
    * Creates a new module.
    * 
-   * @param id Module ID (from module document stored in database)
    * @param type Module type
-   * @param socket Linked websocket
    * @returns Created module
    */
-  public async create(id: string, type: ModuleType, socket: Socket): Promise<Module> {
-    const container = ServiceContainer.getInstance();
-    if (!await container.db.modules.exists({ _id: id })) {
-      throw new Error(`Module not found with ID ${id}`);
-    }
-    switch (type) {
-      case ModuleType.LED_STRIP: return new LedStripModule(container, id, socket);
-      default: throw new Error(`Unknown module type ${type}`);
-    }
+  public async create(type: ModuleType): Promise<Module> {
+    const doc = await (await this.db.modules.create({ type })).populate('token');
+    const module = this.loadInternal(doc);
+    this.modules.push(module);
+    this.deleteInvalidatedTimeout(module);
+    return module;
   }
 
   /**
-   * Generates a new token for the given module.
-   * 
-   * This method returns and stores the generated token in database.
-   * 
-   * @param module Module
-   * @returns Generated token
-   */
-  public async generateToken(module: ModuleDocument): Promise<string> {
-    const token = this.container.crypto.generateRandomString(Number(process.env.MODULE_TOKEN_LENGTH));
-    module.token = token;
-    await module.save();
-    return token;
-  }
-
-  /**
-   * Registers a module.
-   * 
-   * @param module Module to register
-   */
-  public register(module: Module): void {
-    this.registeredModules.push(module);
-  }
-
-  /**
-   * Disconnects a module.
-   * 
-   * @param module Module to disconnect
-   */
-  public disconnect(module: Module): void {
-    module.unload();
-    _.remove(this.registeredModules, registeredModule => registeredModule.id === module.id);
-  }
-
-  /**
-   * Disconnects all online modules.
+   * Disconnects all modules.
    */
   public async disconnectAll(): Promise<void> {
-    this.registeredModules.forEach(module => {
-      module.unload();
-    });
-    this.registeredModules = [];
-    await this.db.modules.updateMany({ status: ModuleStatus.ONLINE }, { status: ModuleStatus.OFFLINE });
+    this.modules.forEach(module => module.disconnect());
   }
 
   /**
-   * Validates a module.
+   * Loads a module from it document.
    * 
-   * Validation will sets the module status to `OFFLINE`.
+   * This method is only used in this service.
    * 
-   * @param module Module to validate
+   * @param doc Module document
+   * @returns Created module
    */
-  public async validate(module: ModuleDocument): Promise<void> {
-    if (module.status === ModuleStatus.PENDING) {
-      module.status = ModuleStatus.OFFLINE;
-      await module.save();
+  private loadInternal(doc: ModuleDocument): Module {
+    switch (doc.type) {
+      case ModuleType.LED_STRIP: return new LedStripModule(this.container, doc);
+      default: throw new Error(`Unknown module type ${doc.type}`);
     }
   }
 
   /**
-   * Invalidates a module.
-   * 
-   * Invalidation will sets the module status to `PENDING`.
-   * 
-   * @param module Module to validate
+   * Deletes a module if it has been invalid for too long
+   * @param module Module to process
    */
-  public async invalidate(module: ModuleDocument): Promise<void> {
-    if (module.status !== ModuleStatus.PENDING) {
-      module.status = ModuleStatus.PENDING;
-      await module.save();
-    }
-  }
-
-  /**
-   * Starts timeout for given module(s).
-   * 
-   * is no ID is provided, the method will sets the pending timeout to all pending modules stored in database.
-   * 
-   * @param moduleIds ID(s) of modules to sets the pending timeout
-   */
-  public setPendingTimeout(...moduleIds: string[]): void {
-    setTimeout(async () => {
-      try {
-        if (moduleIds.length === 0) {
-          moduleIds = (await this.db.modules.find({ status: ModuleStatus.PENDING })).map(module => module.id);
-        }
-        moduleIds.forEach(async moduleId => {
-          const module = await this.db.modules.findOneAndDelete({ _id: moduleId, status: ModuleStatus.PENDING });
-          if (module != null) {
-            this.logger.info('Deleted module', module.id, `(${Module.getTypeName(module.type)})`, 'due to pending timeout');
-          }
-        });
-      } catch (err) {
-        this.logger.error('Could not delete pending timeout module :', err);
+  private deleteInvalidatedTimeout(module: Module): void {
+    this.container.scheduler.runTimer(async () => {
+      if (!module.validated) {
+        module.disconnect();
+        await this.db.modules.deleteOne({ _id: module.id });
+        _.remove(this.modules, currentModule => currentModule.id === module.id);
+        this.logger.info('The module', module.name ? `${module.name} (${module.id})` : module.id, 'has been deleted due to invalidated for too long');
       }
-    }, this.container.config.services.modules.deletePendingTimeout * 1000);
+    }, this.container.config.services.modules.deleteInvalidatedTimeout * 1000);
   }
 }
