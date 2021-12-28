@@ -208,7 +208,7 @@ export default abstract class Module extends Component implements ModuleAttribut
    */
   protected send<T extends ModuleDataOut>(eventName: string, data?: T): void {
     if (this.isOffline()) {
-      throw new ModuleError('Could not send websocket event, the module is offline');
+      throw new ModuleError('Module is offline');
     }
     eventName = `module.${this.type}.${eventName}`;
     if (data == null) {
@@ -232,7 +232,7 @@ export default abstract class Module extends Component implements ModuleAttribut
     eventName = `module.${this.type}.${eventName}`;
     this.listeners.push(eventName);
     if (this.isOffline()) {
-      throw new ModuleError('Could not listening websocket event, the module is offline');
+      throw new ModuleError('Module is offline');
     }
     this.socket.on(eventName, async data => {
       if (!this.validated) {

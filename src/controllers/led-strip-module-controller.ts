@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import _ from 'lodash';
 import LedStripModule from '../modules/led-strip/led-strip-module';
 import { Loop, LoopError } from '../modules/led-strip/loop';
-import { ModuleType } from '../modules/module';
+import { ModuleError, ModuleType } from '../modules/module';
 import ServiceContainer from '../services/service-container';
 import Controller from './controller';
 
@@ -53,6 +53,12 @@ export default class LedStripModuleController extends Controller {
       return res.status(200).json();
     } catch (err) {
       this.logger.error(err);
+      if (err instanceof ModuleError) {
+        return res.status(400).json(this.container.errors.formatErrors({
+          error: 'bad_request',
+          error_description: err.message
+        }))
+      }
       return res.status(500).send(this.container.errors.formatServerError());
     }
   }
@@ -85,11 +91,11 @@ export default class LedStripModuleController extends Controller {
       return res.status(200).json();
     } catch (err) {
       this.logger.error(err);
-      if (err instanceof LoopError) {
-        return res.status(400).send(this.container.errors.formatErrors({
+      if (err instanceof ModuleError || err instanceof LoopError) {
+        return res.status(400).json(this.container.errors.formatErrors({
           error: 'bad_request',
-          error_description: 'Invalid loop'
-        }));
+          error_description: err.message
+        }))
       }
       return res.status(500).send(this.container.errors.formatServerError());
     }

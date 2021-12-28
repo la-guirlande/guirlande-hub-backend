@@ -28,7 +28,7 @@ export default class ModuleWebSocket extends Websocket {
           if (module.validated) {
             module.connect(socket);
             socket.data.moduleId = module.id;
-            this.logger.info('Module', (module.name && `${module.name} (${module.id})`) || module.id, 'registered');
+            this.logger.info('Module', (module.name && `${module.name} (${module.id})`) || module.id, 'connected');
             return socket.emit(Event.CONNECT, { status: module.status } as ConnectServerToClientEvent);
           }
           return socket.emit(Event.ERROR, { error: 'MODULE_NOT_VALIDATED' } as ErrorServerToClientEvent);
