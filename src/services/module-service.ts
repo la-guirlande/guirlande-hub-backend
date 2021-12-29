@@ -79,7 +79,8 @@ export default class ModuleService extends Service {
   }
 
   /**
-   * Deletes a module if it has been invalid for too long
+   * Deletes a module if it has been invalid for too long.
+   * 
    * @param module Module to process
    */
   private deleteInvalidatedTimeout(module: Module): void {
