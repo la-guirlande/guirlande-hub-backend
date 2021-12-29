@@ -38,7 +38,7 @@ export default class ModuleService extends Service {
    * Unloads all modules.
    */
   public async unload(): Promise<void> {
-    this.modules.forEach(module => module.disconnect());
+    this.disconnectAll();
     this.modules.length = 0;
   }
 
