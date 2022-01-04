@@ -68,9 +68,8 @@ export default abstract class Module extends Component implements ModuleAttribut
    */
   public disconnect(): void {
     if (this.isOnline()) {
-      this.listeners.forEach(this.socket.removeAllListeners);
       this.listeners.length = 0;
-      this.socket.disconnect();
+      this.socket.disconnect(true);
       this._status = ModuleStatus.OFFLINE;
       this.socket = null;
     }
