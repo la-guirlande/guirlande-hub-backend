@@ -248,7 +248,8 @@ export default abstract class Module extends Component implements ModuleAttribut
  * Module types.
  */
 export enum ModuleType {
-  LED_STRIP = 0
+  TEST = 0,
+  LED_STRIP = 1
 }
 
 /**

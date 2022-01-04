@@ -3,6 +3,7 @@ import AuthenticationController from '../controllers/authentication-controller';
 import Controller from '../controllers/controller';
 import LedStripModuleController from '../controllers/led-strip-module-controller';
 import ModuleController from '../controllers/module-controller';
+import TestModuleController from '../controllers/test-module-controller';
 import UserController from '../controllers/user-controller';
 import Service from './service';
 import ServiceContainer from './service-container';
@@ -29,6 +30,7 @@ export default class ControllerService extends Service {
       new AuthenticationController(container),
       new UserController(container),
       new ModuleController(container),
+      new TestModuleController(container),
       new LedStripModuleController(container)
     ];
   }
