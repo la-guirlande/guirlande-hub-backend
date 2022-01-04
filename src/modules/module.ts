@@ -158,8 +158,19 @@ export default abstract class Module extends Component implements ModuleAttribut
    * 
    * Don't forger to save the module after modifications with `save()` method.
    */
-   public set metadata(metadata: unknown) {
+   public set metadata(metadata: object) {
     this.doc.metadata = metadata;
+  }
+
+  /**
+   * Updates the module metadata.
+   * 
+   * Instead of the metadata setter, this method will merge new metadata with current metadata.
+   * 
+   * @param metadata Metadata to update
+   */
+  public updateMetadata<T extends object>(metadata: T): void {
+    this.doc.metadata = { ...this.doc.metadata, ...metadata };
   }
 
   /**

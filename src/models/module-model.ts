@@ -12,7 +12,7 @@ export interface Module extends Timestamps {
   name?: string;
   validated?: boolean;
   token?: string;
-  metadata?: unknown;
+  metadata?: object;
 }
 
 /**
@@ -64,7 +64,7 @@ function createModuleSchema() {
     },
     metadata: {
       type: Schema.Types.Mixed,
-      default: null
+      default: {}
     }
   }, {
     timestamps: true,
