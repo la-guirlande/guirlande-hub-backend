@@ -55,8 +55,8 @@ export default abstract class Module extends Component implements ModuleAttribut
   public connect(socket: Socket): void {
     if (this.isOffline()) {
       this.socket = socket;
-      this.registerListeners();
       this._status = ModuleStatus.ONLINE;
+      this.registerListeners();
     }
   }
 

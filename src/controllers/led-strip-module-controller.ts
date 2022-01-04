@@ -9,7 +9,7 @@ import Controller from './controller';
 /**
  * LED strip module controller.
  * 
- * This controller is used to manage modules with type = `LED_STRIP` (0).
+ * This controller is used to manage led strip modules.
  */
 export default class LedStripModuleController extends Controller {
 
@@ -42,7 +42,7 @@ export default class LedStripModuleController extends Controller {
       }));
     }
     try {
-      const module = this.container.modules.modules.find(module => module.id === req.params.moduleId) as LedStripModule;
+      const module = this.container.modules.modules.find(module => module.id === req.params.moduleId && module.type === ModuleType.LED_STRIP) as LedStripModule;
       if (module == null) {
         return res.status(404).json(this.container.errors.formatErrors({
           error: 'not_found',
@@ -75,7 +75,7 @@ export default class LedStripModuleController extends Controller {
   public async sendLoopHandler(req: Request, res: Response): Promise<Response> {
     const { loop: loopData } = req.body;
     try {
-      const module = this.container.modules.modules.find(module => module.id === req.params.moduleId) as LedStripModule;
+      const module = this.container.modules.modules.find(module => module.id === req.params.moduleId && module.type === ModuleType.LED_STRIP) as LedStripModule;
       if (module == null) {
         return res.status(404).json(this.container.errors.formatErrors({
           error: 'not_found',

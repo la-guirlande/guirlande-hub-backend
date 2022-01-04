@@ -4,9 +4,7 @@ import Module, { ModuleDataOut } from '../module';
 import { Loop } from './loop';
 
 /**
- * LED strip module
- * 
- * Type : `LED_STRIP` (0)
+ * LED strip module.
  */
 export default class LedStripModule extends Module {
 
