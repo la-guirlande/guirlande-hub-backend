@@ -18,7 +18,9 @@ export default class ModuleController extends Controller {
 
     this.registerEndpoint({ method: 'GET', uri: '/', handlers: this.listHandler });
     this.registerEndpoint({ method: 'GET', uri: '/:moduleId', handlers: this.getHandler });
-    this.registerEndpoint({ method: 'POST', uri: '/register', handlers: this.registerHandler });
+    this.registerEndpoint({ method: 'POST', uri: '/', handlers: this.registerHandler });
+    this.registerEndpoint({ method: 'PUT', uri: '/:moduleId', handlers: this.modifyHandler });
+    this.registerEndpoint({ method: 'PATCH', uri: '/:moduleId', handlers: this.updateHandler });
     this.registerEndpoint({ method: 'PUT', uri: '/:moduleId/validate', handlers: this.validateHandler });
     this.registerEndpoint({ method: 'PUT', uri: '/:moduleId/invalidate', handlers: this.invalidateHandler });
     this.registerEndpoint({ method: 'POST', uri: '/:moduleId/disconnect', handlers: this.disconnectHandler });
@@ -81,6 +83,74 @@ export default class ModuleController extends Controller {
     try {
       const module = await this.container.modules.create(type);
       return res.status(200).json({ token: await module.generateToken() });
+    } catch (err) {
+      this.logger.error(err);
+      if (err instanceof MongooseError.ValidationError) {
+        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err)));
+      }
+      return res.status(500).send(this.container.errors.formatServerError());
+    }
+  }
+
+  /**
+   * Modifies a module.
+   * 
+   * Path : `PUT /modules/:moduleId`
+   * 
+   * @param req Express request
+   * @param res Express response
+   * @async
+   */
+  public async modifyHandler(req: Request, res: Response): Promise<Response> {
+    const { name } = req.body;
+    try {
+      const module = this.container.modules.modules.find(module => module.id === req.params.moduleId);
+      if (module == null) {
+        return res.status(404).json(this.container.errors.formatErrors({
+          error: 'not_found',
+          error_description: 'Module not found'
+        }));
+      }
+      module.name = name || null;
+      await module.save();
+      return res.status(200).json({ id: module.id });
+    } catch (err) {
+      this.logger.error(err);
+      if (err instanceof MongooseError.ValidationError) {
+        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err)));
+      }
+      return res.status(500).send(this.container.errors.formatServerError());
+    }
+  }
+
+  /**
+   * Updates a module.
+   * 
+   * Path : `PATCH /modules/:moduleId`
+   * 
+   * @param req Express request
+   * @param res Express response
+   * @async
+   */
+  public async updateHandler(req: Request, res: Response): Promise<Response> {
+    const { name } = req.body;
+    try {
+      const module = this.container.modules.modules.find(module => module.id === req.params.moduleId);
+      if (module == null) {
+        return res.status(404).json(this.container.errors.formatErrors({
+          error: 'not_found',
+          error_description: 'Module not found'
+        }));
+      }
+      let updated = false;
+      if (name != null) {
+        module.name = name;
+        updated = true;
+      }
+      if (updated) {
+        await module.save();
+      }
+      return res.status(200).json({ id: module.id });
     } catch (err) {
       this.logger.error(err);
       if (err instanceof MongooseError.ValidationError) {
