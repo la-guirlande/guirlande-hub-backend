@@ -147,6 +147,36 @@ export default abstract class Module extends Component implements ModuleAttribut
   }
 
   /**
+   * Module metadata data.
+   */
+  public get metadata() {
+    return this.doc.metadata;
+  }
+
+  /**
+   * Sets module metadata.
+   * 
+   * Don't forger to save the module after modifications with `save()` method.
+   */
+   public set metadata(metadata: unknown) {
+    this.doc.metadata = metadata;
+  }
+
+  /**
+   * Module creation date.
+   */
+  public get createdAt() {
+    return this.doc.createdAt;
+  }
+
+  /**
+   * Module last update date.
+   */
+  public get updatedAt() {
+    return this.doc.updatedAt;
+  }
+
+  /**
    * A validated module is a module that can communicate with it websocket events.
    * If not, the module can only use the `module.connect` event.
    * 
@@ -193,6 +223,7 @@ export default abstract class Module extends Component implements ModuleAttribut
       id: this.id,
       type: this.type,
       name: this.name,
+      metadata: this.metadata,
       validated: this.validated,
       createdAt: this.doc.createdAt,
       updatedAt: this.doc.updatedAt,
