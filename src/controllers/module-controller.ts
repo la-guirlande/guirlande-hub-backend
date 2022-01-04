@@ -21,6 +21,7 @@ export default class ModuleController extends Controller {
     this.registerEndpoint({ method: 'POST', uri: '/register', handlers: this.registerHandler });
     this.registerEndpoint({ method: 'PUT', uri: '/:moduleId/validate', handlers: this.validateHandler });
     this.registerEndpoint({ method: 'PUT', uri: '/:moduleId/invalidate', handlers: this.invalidateHandler });
+    this.registerEndpoint({ method: 'POST', uri: '/:moduleId/disconnect', handlers: this.disconnectHandler });
   }
 
   /**
