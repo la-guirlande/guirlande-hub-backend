@@ -41,7 +41,9 @@ export default class ServerService extends Service {
 
     // Loads all modules
     await this.container.modules.load();
-    this.logger.info(`Loaded ${this.container.modules.modules.length} modules`);
+    const modules = this.container.modules.modules;
+    this.logger.info(`Loaded ${modules.length} modules :`);
+    modules.sort(module => module.type).forEach(module => this.logger.info('  -', module.fullName));
   }
 
   /**

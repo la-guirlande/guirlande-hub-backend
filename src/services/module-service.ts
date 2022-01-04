@@ -91,7 +91,7 @@ export default class ModuleService extends Service {
         module.disconnect();
         await this.db.modules.deleteOne({ _id: module.id });
         _.remove(this.modules, currentModule => currentModule.id === module.id);
-        this.logger.info('The module', module.name ? `${module.name} (${module.id})` : module.id, 'has been deleted due to invalidated for too long');
+        this.logger.info('The module', module.fullName, 'has been deleted due to invalidated for too long');
       }
     }, this.container.config.services.modules.deleteInvalidatedTimeout * 1000);
   }

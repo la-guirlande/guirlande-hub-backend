@@ -131,6 +131,15 @@ export default abstract class Module extends Component implements ModuleAttribut
   }
 
   /**
+   * Module full name.
+   * 
+   * If the module has a defined name, this returns `<module_name> (<module_id>)`. Otherwise, this returns the module ID.
+   */
+  public get fullName(): string {
+    return this.name ? `${this.name} (${this.id})` : this.id;
+  }
+
+  /**
    * Module token.
    */
   public get token(): string {
