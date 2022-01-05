@@ -41,6 +41,7 @@ export default class ServerService extends Service {
 
     // Loads all modules
     await this.container.modules.load();
+    this.logger.info(`Loaded ${this.container.modules.modules.length} modules`);
   }
 
   /**
@@ -62,5 +63,6 @@ export default class ServerService extends Service {
 
     // Unloads all modules
     await this.container.modules.unload();
+    this.logger.info('Unloaded modules');
   }
 }

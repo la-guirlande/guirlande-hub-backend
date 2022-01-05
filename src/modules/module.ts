@@ -55,8 +55,8 @@ export default abstract class Module extends Component implements ModuleAttribut
   public connect(socket: Socket): void {
     if (this.isOffline()) {
       this.socket = socket;
-      this.registerListeners();
       this._status = ModuleStatus.ONLINE;
+      this.registerListeners();
     }
   }
 
@@ -68,9 +68,8 @@ export default abstract class Module extends Component implements ModuleAttribut
    */
   public disconnect(): void {
     if (this.isOnline()) {
-      this.listeners.forEach(this.socket.removeAllListeners);
       this.listeners.length = 0;
-      this.socket.disconnect();
+      this.socket.disconnect(true);
       this._status = ModuleStatus.OFFLINE;
       this.socket = null;
     }
@@ -248,7 +247,8 @@ export default abstract class Module extends Component implements ModuleAttribut
  * Module types.
  */
 export enum ModuleType {
-  LED_STRIP = 0
+  TEST = 0,
+  LED_STRIP = 1
 }
 
 /**
