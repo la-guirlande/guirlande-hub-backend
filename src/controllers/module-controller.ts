@@ -24,6 +24,7 @@ export default class ModuleController extends Controller {
     this.registerEndpoint({ method: 'PUT', uri: '/:moduleId/validate', handlers: this.validateHandler });
     this.registerEndpoint({ method: 'PUT', uri: '/:moduleId/invalidate', handlers: this.invalidateHandler });
     this.registerEndpoint({ method: 'POST', uri: '/:moduleId/disconnect', handlers: this.disconnectHandler });
+    this.registerEndpoint({ method: 'DELETE', uri: '/:moduleId', handlers: this.deleteHandler });
   }
 
   /**
@@ -238,6 +239,35 @@ export default class ModuleController extends Controller {
       }
       module.disconnect();
       return res.status(200).json();
+    } catch (err) {
+      this.logger.error(err);
+      if (err instanceof MongooseError.ValidationError) {
+        return res.status(400).send(this.container.errors.formatErrors(...this.container.errors.translateMongooseValidationError(err)));
+      }
+      return res.status(500).send(this.container.errors.formatServerError());
+    }
+  }
+
+  /**
+   * Deletes a module.
+   * 
+   * Path : `DELETE /modules/:moduleId`
+   * 
+   * @param req Express request
+   * @param res Express response
+   * @async
+   */
+  public async deleteHandler(req: Request, res: Response): Promise<Response> {
+    try {
+      const module = this.container.modules.modules.find(module => module.id === req.params.moduleId);
+      if (module == null) {
+        return res.status(404).json(this.container.errors.formatErrors({
+          error: 'not_found',
+          error_description: 'Module not found'
+        }));
+      }
+      await this.container.modules.delete(module);
+      return res.status(204).json();
     } catch (err) {
       this.logger.error(err);
       if (err instanceof MongooseError.ValidationError) {

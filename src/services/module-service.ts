@@ -58,6 +58,19 @@ export default class ModuleService extends Service {
   }
 
   /**
+   * Deletes a module.
+   * 
+   * **Warning** : This method will deletes the specified module from database. It will not be able to communicate with the backend.
+   * 
+   * @param module Module to delete
+   */
+  public async delete(module: Module): Promise<void> {
+    module.disconnect();
+    await this.db.modules.deleteOne({ _id: module.id });
+    _.remove(this.modules, currentModule => currentModule.id === module.id);
+  }
+
+  /**
    * Disconnects all modules.
    */
   public async disconnectAll(): Promise<void> {
@@ -88,9 +101,7 @@ export default class ModuleService extends Service {
   private deleteInvalidatedTimeout(module: Module): void {
     this.container.scheduler.runTimer(async () => {
       if (!module.validated) {
-        module.disconnect();
-        await this.db.modules.deleteOne({ _id: module.id });
-        _.remove(this.modules, currentModule => currentModule.id === module.id);
+        this.delete(module);
         this.logger.info('The module', module.fullName, 'has been deleted due to invalidated for too long');
       }
     }, this.container.config.services.modules.deleteInvalidatedTimeout * 1000);
