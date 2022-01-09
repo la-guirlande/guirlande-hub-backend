@@ -42,8 +42,13 @@ export default class ServerService extends Service {
     // Loads all modules
     await this.container.modules.load();
     const modules = this.container.modules.modules;
-    this.logger.info(`Loaded ${modules.length} modules :`);
-    modules.sort(module => module.type).forEach(module => this.logger.info('  -', module.fullName));
+    if (modules.length > 0) {
+      this.logger.info(`Loaded ${modules.length} module${modules.length === 1 ? '' : 's'} :`);
+      modules
+        .sort((m1, m2) => m1.fullName.localeCompare(m2.fullName))
+        .sort((m1, m2) => m1.validated && m2.validated ? 0 : m1.validated ? -1 : 1)
+        .forEach(module => this.logger.info('  -', module.validated ? '✅' : '❌', module.fullName));
+    }
   }
 
   /**
