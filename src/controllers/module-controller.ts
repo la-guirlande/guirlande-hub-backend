@@ -16,15 +16,15 @@ export default class ModuleController extends Controller {
   public constructor(container: ServiceContainer) {
     super(container, '/modules');
 
-    this.registerEndpoint({ method: 'GET', uri: '/', handlers: this.listHandler });
-    this.registerEndpoint({ method: 'GET', uri: '/:moduleId', handlers: this.getHandler });
+    this.registerEndpoint({ method: 'GET', uri: '/', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.listHandler] });
+    this.registerEndpoint({ method: 'GET', uri: '/:moduleId', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.getHandler] });
     this.registerEndpoint({ method: 'POST', uri: '/', handlers: this.registerHandler });
-    this.registerEndpoint({ method: 'PUT', uri: '/:moduleId', handlers: this.modifyHandler });
-    this.registerEndpoint({ method: 'PATCH', uri: '/:moduleId', handlers: this.updateHandler });
-    this.registerEndpoint({ method: 'PUT', uri: '/:moduleId/validate', handlers: this.validateHandler });
-    this.registerEndpoint({ method: 'PUT', uri: '/:moduleId/invalidate', handlers: this.invalidateHandler });
-    this.registerEndpoint({ method: 'POST', uri: '/:moduleId/disconnect', handlers: this.disconnectHandler });
-    this.registerEndpoint({ method: 'DELETE', uri: '/:moduleId', handlers: this.deleteHandler });
+    this.registerEndpoint({ method: 'PUT', uri: '/:moduleId', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.modifyHandler] });
+    this.registerEndpoint({ method: 'PATCH', uri: '/:moduleId', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.updateHandler] });
+    this.registerEndpoint({ method: 'PUT', uri: '/:moduleId/validate', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.validateHandler] });
+    this.registerEndpoint({ method: 'PUT', uri: '/:moduleId/invalidate', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.invalidateHandler] });
+    this.registerEndpoint({ method: 'POST', uri: '/:moduleId/disconnect', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.disconnectHandler] });
+    this.registerEndpoint({ method: 'DELETE', uri: '/:moduleId', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.deleteHandler] });
   }
 
   /**
