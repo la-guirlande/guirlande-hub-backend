@@ -20,7 +20,7 @@ export default class LedStripModule extends Module {
   }
 
   public connect(socket: Socket): void {
-    super.connect(socket); // TODO Too fast, the module (client-side) receives the event before it connection.
+    super.connect(socket);
     const metadata: LedStripModuleMetadata = this.metadata;
     if (metadata.currentLoop != null) {
       this.sendLoop(new Loop(metadata.currentLoop));
