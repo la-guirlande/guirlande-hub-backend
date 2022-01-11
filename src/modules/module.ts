@@ -131,10 +131,60 @@ export default abstract class Module extends Component implements ModuleAttribut
   }
 
   /**
+   * Module full name.
+   * 
+   * If the module has a defined name, this returns `<module_name> (<module_id>)`. Otherwise, this returns the module ID.
+   */
+  public get fullName(): string {
+    return this.name ? `${this.name} (${this.id})` : this.id;
+  }
+
+  /**
    * Module token.
    */
   public get token(): string {
     return this.doc.token;
+  }
+
+  /**
+   * Module metadata data.
+   */
+  public get metadata() {
+    return this.doc.metadata;
+  }
+
+  /**
+   * Sets module metadata.
+   * 
+   * Don't forger to save the module after modifications with `save()` method.
+   */
+   public set metadata(metadata: object) {
+    this.doc.metadata = metadata;
+  }
+
+  /**
+   * Updates the module metadata.
+   * 
+   * Instead of the metadata setter, this method will merge new metadata with current metadata.
+   * 
+   * @param metadata Metadata to update
+   */
+  public updateMetadata<T extends object>(metadata: T): void {
+    this.doc.metadata = { ...this.doc.metadata, ...metadata };
+  }
+
+  /**
+   * Module creation date.
+   */
+  public get createdAt() {
+    return this.doc.createdAt;
+  }
+
+  /**
+   * Module last update date.
+   */
+  public get updatedAt() {
+    return this.doc.updatedAt;
   }
 
   /**
@@ -184,6 +234,7 @@ export default abstract class Module extends Component implements ModuleAttribut
       id: this.id,
       type: this.type,
       name: this.name,
+      metadata: this.metadata,
       validated: this.validated,
       createdAt: this.doc.createdAt,
       updatedAt: this.doc.updatedAt,

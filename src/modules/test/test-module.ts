@@ -33,6 +33,11 @@ export default class TestModule extends Module {
   }
 
   protected registerListeners(): void {
-    this.listening('data', async data => this.logger.info('Received data from module', this.name ? `${this.name} (${this.id})` : this.id, ':', data));
+    this.listening('data', async data => {
+      this.logger.info('Received data from module', this.fullName, ':', data);
+      this.metadata = data;
+      await this.save();
+      this.logger.info('Saved data in the module metadata');
+    });
   }
 }

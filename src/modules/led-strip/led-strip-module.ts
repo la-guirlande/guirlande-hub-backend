@@ -1,3 +1,4 @@
+import { Socket } from 'socket.io';
 import { ModuleDocument } from '../../models/module-model';
 import ServiceContainer from '../../services/service-container';
 import Module, { ModuleDataOut } from '../module';
@@ -18,6 +19,18 @@ export default class LedStripModule extends Module {
     super(container, doc);
   }
 
+  public connect(socket: Socket): void {
+    super.connect(socket);
+    const metadata: LedStripModuleMetadata = this.metadata;
+    if (metadata.currentLoop != null) {
+      this.sendLoop(new Loop(metadata.currentLoop));
+    } else if (metadata.currentColor != null) {
+      this.sendColor(metadata.currentColor.red, metadata.currentColor.green, metadata.currentColor.blue);
+    } else {
+      this.sendColor(100, 100, 100);
+    }
+  }
+
   /**
    * Sends a color.
    * 
@@ -27,6 +40,9 @@ export default class LedStripModule extends Module {
    */
   public sendColor(red: number, green: number, blue: number): void {
     this.send<LedStripModuleColorDataOut>('color', { red, green, blue });
+    this.updateMetadata<LedStripModuleMetadata>({
+      currentColor: { red, green, blue }
+    });
   }
 
   /**
@@ -37,7 +53,11 @@ export default class LedStripModule extends Module {
    * @param loop Loop to send
    */
   public sendLoop(loop?: Loop): void {
-    this.send<LedStripModuleLoopDataOut>('loop', { loop: loop?.build() });
+    const loopData = loop?.build();
+    this.send<LedStripModuleLoopDataOut>('loop', { loop: loopData });
+    this.updateMetadata<LedStripModuleMetadata>({
+      currentLoop: loopData
+    });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -58,4 +78,16 @@ export interface LedStripModuleColorDataOut extends ModuleDataOut {
  */
 export interface LedStripModuleLoopDataOut extends ModuleDataOut {
   loop?: string;
+}
+
+/**
+ * LED strip module metadata.
+ */
+export interface LedStripModuleMetadata {
+  currentColor?: {
+    red: number;
+    green: number;
+    blue: number;
+  };
+  currentLoop?: string;
 }

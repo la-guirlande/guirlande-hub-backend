@@ -20,8 +20,8 @@ export default class LedStripModuleController extends Controller {
    */
   public constructor(container: ServiceContainer) {
     super(container, `/modules/${_.kebabCase(ModuleType[ModuleType.LED_STRIP])}`);
-    this.registerEndpoint({ method: 'POST', uri: '/:moduleId/color', handlers: this.sendColorHandler });
-    this.registerEndpoint({ method: 'POST', uri: '/:moduleId/loop', handlers: this.sendLoopHandler });
+    this.registerEndpoint({ method: 'POST', uri: '/:moduleId/color', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.sendColorHandler] });
+    this.registerEndpoint({ method: 'POST', uri: '/:moduleId/loop', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.sendLoopHandler] });
   }
 
   /**
