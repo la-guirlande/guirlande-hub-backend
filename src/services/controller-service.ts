@@ -2,6 +2,7 @@ import { Application } from 'express';
 import AuthenticationController from '../controllers/authentication-controller';
 import Controller from '../controllers/controller';
 import LedStripModuleController from '../controllers/led-strip-module-controller';
+import MagasinController from '../controllers/magasin-module-controller';
 import ModuleController from '../controllers/module-controller';
 import TestModuleController from '../controllers/test-module-controller';
 import UserController from '../controllers/user-controller';
@@ -31,7 +32,8 @@ export default class ControllerService extends Service {
       new UserController(container),
       new ModuleController(container),
       new TestModuleController(container),
-      new LedStripModuleController(container)
+      new LedStripModuleController(container),
+      new MagasinController(container)
     ];
   }
 

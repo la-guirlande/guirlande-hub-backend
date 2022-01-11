@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { ModuleDocument } from '../models/module-model';
 import LedStripModule from '../modules/led-strip/led-strip-module';
+import MagasinModule from '../modules/magasin/magasin-module';
 import Module, { ModuleType } from '../modules/module';
 import TestModule from '../modules/test/test-module';
 import Service from './service';
@@ -89,6 +90,7 @@ export default class ModuleService extends Service {
     switch (doc.type) {
       case ModuleType.TEST: return new TestModule(this.container, doc);
       case ModuleType.LED_STRIP: return new LedStripModule(this.container, doc);
+      case ModuleType.MAGASIN: return new MagasinModule(this.container, doc);
       default: throw new Error(`Unknown module type ${doc.type}`);
     }
   }
