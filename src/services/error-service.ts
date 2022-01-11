@@ -101,6 +101,7 @@ export interface APIErrorResponse {
  */
 export type ErrorCode =
     'access_denied'
+  | 'bad_request'
   | 'invalid_client'
   | 'invalid_grant'
   | 'invalid_request'

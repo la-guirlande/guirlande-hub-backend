@@ -22,9 +22,9 @@ export default class UserController extends Controller {
     this.registerEndpoint({ method: 'GET', uri: '/', handlers: this.listHandler });
     this.registerEndpoint({ method: 'GET', uri: '/:id', handlers: this.getHandler });
     this.registerEndpoint({ method: 'POST', uri: '/', handlers: this.createHandler });
-    this.registerEndpoint({ method: 'PUT', uri: '/:id', handlers: this.modifyHandler });
-    this.registerEndpoint({ method: 'PATCH', uri: '/:id', handlers: this.updateHandler });
-    this.registerEndpoint({ method: 'DELETE', uri: '/:id', handlers: this.deleteHandler });
+    this.registerEndpoint({ method: 'PUT', uri: '/:id', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.modifyHandler] });
+    this.registerEndpoint({ method: 'PATCH', uri: '/:id', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.updateHandler] });
+    this.registerEndpoint({ method: 'DELETE', uri: '/:id', handlers: [this.container.auth.authenticateHandler, this.container.auth.isAuthenticatedHandler, this.deleteHandler] });
   }
 
   /**
