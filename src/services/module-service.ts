@@ -3,6 +3,7 @@ import { ModuleDocument } from '../models/module-model';
 import LedStripModule from '../modules/led-strip/led-strip-module';
 import Module, { ModuleType } from '../modules/module';
 import TestModule from '../modules/test/test-module';
+import WeatherModule from '../modules/weather/weather-module';
 import Service from './service';
 import ServiceContainer from './service-container';
 
@@ -89,6 +90,7 @@ export default class ModuleService extends Service {
     switch (doc.type) {
       case ModuleType.TEST: return new TestModule(this.container, doc);
       case ModuleType.LED_STRIP: return new LedStripModule(this.container, doc);
+      case ModuleType.WEATHER: return new WeatherModule(this.container, doc);
       default: throw new Error(`Unknown module type ${doc.type}`);
     }
   }
