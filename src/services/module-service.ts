@@ -30,7 +30,7 @@ export default class ModuleService extends Service {
    * Loads all modules.
    */
   public async load(): Promise<void> {
-    const docs = await this.db.modules.find().populate('token');
+    const docs = await this.db.modules.find().select('+token');
     const modules = docs.map(doc => this.loadInternal(doc))
     this.modules.push(...modules);
     this.modules.filter(module => !module.validated).forEach(module => this.deleteInvalidatedTimeout(module));
@@ -51,7 +51,8 @@ export default class ModuleService extends Service {
    * @returns Created module
    */
   public async create(type: ModuleType): Promise<Module> {
-    const doc = await (await this.db.modules.create({ type })).populate('token');
+    const { id } = await this.db.modules.create({ type });
+    const doc = await this.db.modules.findById(id).select('+token');
     const module = this.loadInternal(doc);
     this.modules.push(module);
     this.deleteInvalidatedTimeout(module);
