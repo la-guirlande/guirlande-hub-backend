@@ -3,6 +3,7 @@ import { ModuleDocument } from '../models/module-model';
 import LedStripModule from '../modules/led-strip/led-strip-module';
 import Module, { ModuleType } from '../modules/module';
 import TestModule from '../modules/test/test-module';
+import WeatherModule from '../modules/weather/weather-module';
 import Service from './service';
 import ServiceContainer from './service-container';
 
@@ -29,7 +30,7 @@ export default class ModuleService extends Service {
    * Loads all modules.
    */
   public async load(): Promise<void> {
-    const docs = await this.db.modules.find().populate('token');
+    const docs = await this.db.modules.find().select('+token');
     const modules = docs.map(doc => this.loadInternal(doc))
     this.modules.push(...modules);
     this.modules.filter(module => !module.validated).forEach(module => this.deleteInvalidatedTimeout(module));
@@ -50,7 +51,8 @@ export default class ModuleService extends Service {
    * @returns Created module
    */
   public async create(type: ModuleType): Promise<Module> {
-    const doc = await (await this.db.modules.create({ type })).populate('token');
+    const { id } = await this.db.modules.create({ type });
+    const doc = await this.db.modules.findById(id).select('+token');
     const module = this.loadInternal(doc);
     this.modules.push(module);
     this.deleteInvalidatedTimeout(module);
@@ -89,6 +91,7 @@ export default class ModuleService extends Service {
     switch (doc.type) {
       case ModuleType.TEST: return new TestModule(this.container, doc);
       case ModuleType.LED_STRIP: return new LedStripModule(this.container, doc);
+      case ModuleType.WEATHER: return new WeatherModule(this.container, doc);
       default: throw new Error(`Unknown module type ${doc.type}`);
     }
   }

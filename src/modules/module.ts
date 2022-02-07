@@ -124,7 +124,7 @@ export default abstract class Module extends Component implements ModuleAttribut
   /**
    * Sets module name.
    * 
-   * Don't forger to save the module after modifications with `save()` method.
+   * Don't forget to save the module after modifications with `save()` method.
    */
   public set name(name: string) {
     this.doc.name = name;
@@ -156,7 +156,7 @@ export default abstract class Module extends Component implements ModuleAttribut
   /**
    * Sets module metadata.
    * 
-   * Don't forger to save the module after modifications with `save()` method.
+   * Don't forget to save the module after modifications with `save()` method.
    */
    public set metadata(metadata: object) {
     this.doc.metadata = metadata;
@@ -166,6 +166,8 @@ export default abstract class Module extends Component implements ModuleAttribut
    * Updates the module metadata.
    * 
    * Instead of the metadata setter, this method will merge new metadata with current metadata.
+   * 
+   * Don't forget to save the module after modifications with `save()` method.
    * 
    * @param metadata Metadata to update
    */
@@ -278,7 +280,7 @@ export default abstract class Module extends Component implements ModuleAttribut
    * @param eventName Name of the event
    * @param fc Function called when data is received by this event
    */
-  protected listening<T extends ModuleDataIn>(eventName: string, fc: (data: T) => Promise<void>): void {
+  protected listening<T extends ModuleDataIn>(eventName: string, fc: (data: T) => void | Promise<void>): void {
     eventName = `module.${this.type}.${eventName}`;
     this.listeners.push(eventName);
     if (this.isOffline()) {
@@ -299,7 +301,8 @@ export default abstract class Module extends Component implements ModuleAttribut
  */
 export enum ModuleType {
   TEST = 0,
-  LED_STRIP = 1
+  LED_STRIP = 1,
+  WEATHER = 2
 }
 
 /**
